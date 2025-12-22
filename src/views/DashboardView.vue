@@ -128,6 +128,12 @@
       <button @click="showExportImport = true" class="btn btn-secondary">
         Export/Import Data
       </button>
+      <button @click="resetAllProgress" class="btn btn-secondary">
+        Reset All Progress
+      </button>
+      <button @click="reinitializeDatabase" class="btn btn-warning" style="background: #f59e0b; color: white;">
+        Reinitialize Database (Fix Missing Cards)
+      </button>
     </div>
 
     <div v-if="showExportImport" class="modal-overlay" @click="showExportImport = false">
@@ -153,6 +159,8 @@ import { useCardStore } from '@/stores/card'
 import { useStatsStore } from '@/stores/stats'
 import { useDeckStore } from '@/stores/deck'
 import * as db from '@/db'
+import { allSecurityPlusCards } from '@/data/domains'
+import { createDeck } from '@/types'
 
 const router = useRouter()
 const cardStore = useCardStore()
@@ -242,6 +250,84 @@ async function importData(event) {
     console.error('Import failed:', error)
     alert('Failed to import data. Please check the file format.')
   }
+}
+
+async function resetAllProgress() {
+  if (!confirm('Reset all card progress? This will mark all cards as new and due for review. Statistics will be preserved.')) {
+    return
+  }
+
+  const now = new Date().toISOString()
+
+  for (const card of cardStore.cards) {
+    const resetCard = {
+      ...card,
+      repetitions: 0,
+      interval: 1,
+      easeFactor: 2.5,
+      nextReview: now,
+      lastReviewed: null,
+      totalReviews: 0,
+      correctReviews: 0,
+      updatedAt: now
+    }
+
+    const plainCard = JSON.parse(JSON.stringify(resetCard))
+    await db.saveCard(plainCard)
+  }
+
+  await cardStore.loadCards()
+  alert('All cards have been reset! All cards are now due for review.')
+}
+
+async function reinitializeDatabase() {
+  if (!confirm(`This will DELETE ALL DATA and recreate the database with all ${allSecurityPlusCards.length} Security+ cards. Your progress and statistics will be lost. Continue?`)) {
+    return
+  }
+
+  console.log('=== Reinitializing Database ===')
+
+  // Clear all data
+  await db.clearAllData()
+  console.log('Database cleared')
+
+  // Reload stores
+  await Promise.all([
+    deckStore.loadDecks(),
+    cardStore.loadCards()
+  ])
+  console.log('Stores reloaded')
+
+  // Create default deck
+  const deck = createDeck({
+    name: 'Security+ SY0-701',
+    description: 'CompTIA Security+ SY0-701 certification study deck',
+    isDefault: true
+  })
+  await deckStore.addDeck(deck)
+  deckStore.setCurrentDeck(deck.id)
+  console.log('Deck created:', deck.name)
+
+  // Add all cards
+  const cards = allSecurityPlusCards.map(cardData => ({
+    ...cardData,
+    deckId: deck.id
+  }))
+
+  await cardStore.addCards(cards)
+  console.log(`Added ${cards.length} cards to database`)
+
+  // Reload everything
+  await Promise.all([
+    cardStore.loadCards(),
+    deckStore.loadDecks()
+  ])
+
+  console.log('Final card count:', cardStore.cards.length)
+  alert(`Database reinitialized with ${cardStore.cards.length} cards!`)
+
+  // Reload page to reset all state
+  window.location.reload()
 }
 </script>
 

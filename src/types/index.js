@@ -1,6 +1,7 @@
 export const CardType = {
   DEFINITION: 'definition',
-  SCENARIO: 'scenario'
+  SCENARIO: 'scenario',
+  DRAGDROP: 'dragdrop'
 }
 
 export const Domain = {
@@ -36,6 +37,9 @@ export function createCard({
   options = [],
   correctAnswer = 0,
   explanation = '',
+  instructions = '',
+  targets = [],
+  items = [],
   domain = Domain.THREATS,
   topic = '',
   difficulty = Difficulty.MEDIUM,
@@ -50,6 +54,9 @@ export function createCard({
     options,
     correctAnswer,
     explanation,
+    instructions,
+    targets,
+    items,
     domain,
     topic,
     difficulty,

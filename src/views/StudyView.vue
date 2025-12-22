@@ -36,6 +36,24 @@
         <div class="progress-fill" :style="{ width: progressPercentage + '%' }"></div>
       </div>
 
+      <!-- Pause Overlay -->
+      <div v-if="paused" class="pause-overlay">
+        <div class="pause-card">
+          <div class="pause-icon">☕</div>
+          <h2>Time for a break!</h2>
+          <p>You've been studying for 15 minutes.</p>
+          <p class="break-suggestion">Take a 5-minute stretch break to prevent fatigue.</p>
+          <div class="pause-actions">
+            <button @click="continueStudying" class="btn btn-primary btn-large">
+              Continue Studying
+            </button>
+            <button @click="endStudy" class="btn btn-secondary btn-large">
+              End Session
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div class="card-container">
         <DefinitionCard
           v-if="currentCard.type === 'definition'"
@@ -43,7 +61,12 @@
           @rate="handleRating"
         />
         <ScenarioCard
-          v-else
+          v-else-if="currentCard.type === 'scenario'"
+          :card="currentCard"
+          @rate="handleRating"
+        />
+        <DragDropCard
+          v-else-if="currentCard.type === 'dragdrop'"
           :card="currentCard"
           @rate="handleRating"
         />
@@ -75,6 +98,7 @@ import { useDeckStore } from '@/stores/deck'
 import { useStatsStore } from '@/stores/stats'
 import DefinitionCard from '@/components/DefinitionCard.vue'
 import ScenarioCard from '@/components/ScenarioCard.vue'
+import DragDropCard from '@/components/DragDropCard.vue'
 
 const router = useRouter()
 const cardStore = useCardStore()
@@ -83,6 +107,7 @@ const statsStore = useStatsStore()
 
 const loading = ref(true)
 const currentCard = ref(null)
+const paused = ref(false)
 const sessionStats = ref({
   cardsStudied: 0,
   correctCards: 0,
@@ -90,6 +115,7 @@ const sessionStats = ref({
 })
 const sessionTimer = ref(null)
 const elapsedSeconds = ref(0)
+const pausedAtSeconds = ref(0)
 
 const currentDeck = computed(() => deckStore.currentDeck)
 const dueCards = computed(() => cardStore.dueCards)
@@ -145,7 +171,15 @@ onMounted(async () => {
   sessionStats.value.startTime = Date.now()
 
   sessionTimer.value = setInterval(() => {
-    elapsedSeconds.value = Math.floor((Date.now() - sessionStats.value.startTime) / 1000)
+    if (!paused.value) {
+      elapsedSeconds.value = Math.floor((Date.now() - sessionStats.value.startTime) / 1000)
+
+      // Suggest break after 15 minutes
+      if (elapsedSeconds.value >= 900 && !paused.value) { // 15 minutes = 900 seconds
+        pausedAtSeconds.value = elapsedSeconds.value
+        paused.value = true
+      }
+    }
   }, 1000)
 
   loading.value = false
@@ -158,11 +192,39 @@ onUnmounted(() => {
 })
 
 function loadNextCard() {
+  console.log('=== Loading Next Card ===')
+  console.log('Total cards in store:', cardStore.cards.length)
+  console.log('Due cards count:', cardStore.dueCards.length)
+
+  // Debug: Check how many cards have never been reviewed
+  const unseenCards = cardStore.cards.filter(c => c.totalReviews === 0)
+  console.log('Unseen cards (never reviewed):', unseenCards.length)
+
+  // Debug: Check unique card IDs we've seen
+  const seenCardIds = cardStore.cards.filter(c => c.totalReviews > 0).map(c => c.id)
+  console.log('Cards already reviewed:', seenCardIds.length)
+
+  // Debug: Show next card being loaded
+  console.log('Next card:', cardStore.nextCard)
   currentCard.value = cardStore.nextCard
+  console.log('Current card set to:', currentCard.value?.front)
+
+  // Debug: Log all due cards by domain
+  if (cardStore.dueCards.length > 0) {
+    const dueByDomain = {}
+    cardStore.dueCards.forEach(c => {
+      dueByDomain[c.domain] = (dueByDomain[c.domain] || 0) + 1
+    })
+    console.log('Due cards by domain:', dueByDomain)
+  }
 }
 
 async function handleRating(rating) {
   if (!currentCard.value) return
+
+  console.log('=== Handle Rating ===')
+  console.log('Rating:', rating)
+  console.log('Card being rated:', currentCard.value.front)
 
   const wasCorrect = rating >= 2
 
@@ -171,7 +233,9 @@ async function handleRating(rating) {
     sessionStats.value.correctCards++
   }
 
+  console.log('Calling reviewCard...')
   await cardStore.reviewCard(currentCard.value.id, rating)
+  console.log('reviewCard complete')
 
   await statsStore.addReview({
     cardId: currentCard.value.id,
@@ -179,7 +243,15 @@ async function handleRating(rating) {
     timeSpent: 0
   })
 
+  console.log('Loading next card after rating...')
   loadNextCard()
+}
+
+function continueStudying() {
+  // Adjust start time to account for pause duration
+  const pauseDuration = Date.now() - (sessionStats.value.startTime + pausedAtSeconds.value * 1000)
+  sessionStats.value.startTime += pauseDuration
+  paused.value = false
 }
 
 async function endStudy() {
@@ -377,5 +449,75 @@ async function endStudy() {
   color: #6b7280;
   text-transform: uppercase;
   font-weight: 600;
+}
+
+.pause-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.pause-card {
+  background: white;
+  border-radius: 16px;
+  padding: 48px;
+  max-width: 500px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.pause-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.pause-card h2 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 12px 0;
+}
+
+.pause-card p {
+  font-size: 16px;
+  color: #6b7280;
+  margin: 0 0 8px 0;
+}
+
+.break-suggestion {
+  color: #6366f1;
+  font-weight: 600;
+  margin-bottom: 32px;
+}
+
+.pause-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.btn-large {
+  padding: 14px 28px;
+  font-size: 16px;
 }
 </style>

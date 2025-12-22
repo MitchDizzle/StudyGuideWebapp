@@ -1,28 +1,53 @@
 <template>
-  <div class="card scenario-card">
+  <div class="card dragdrop-card">
     <div class="card-header">
-      <span class="card-type">Scenario</span>
+      <span class="card-type">Drag & Drop</span>
       <span class="card-domain">{{ card.domain }}</span>
     </div>
 
     <div class="card-content">
-      <div class="scenario">{{ card.scenario }}</div>
+      <div class="instructions">{{ card.instructions }}</div>
 
-      <div class="options">
-        <div
-          v-for="(option, index) in card.options"
-          :key="index"
-          class="option"
-          :class="{
-            'selected': selectedAnswer === index,
-            'correct': revealed && index === card.correctAnswer,
-            'incorrect': revealed && selectedAnswer === index && index !== card.correctAnswer,
-            'disabled': revealed
-          }"
-          @click="!revealed && selectAnswer(index)"
-        >
-          <span class="option-letter">{{ getLetter(index) }}</span>
-          <span class="option-text">{{ option }}</span>
+      <div class="drag-drop-container">
+        <div class="targets">
+          <div
+            v-for="(target, index) in targets"
+            :key="index"
+            class="target-zone"
+            @drop="onDrop($event, index)"
+            @dragover.prevent
+            @dragenter.prevent
+          >
+            <div class="target-label">{{ target.label }}</div>
+            <div
+              v-if="placements[index]"
+              class="placed-item"
+              :class="{
+                'correct': revealed && placements[index] === target.correctItem,
+                'incorrect': revealed && placements[index] !== target.correctItem
+              }"
+              draggable="true"
+              @dragstart="onDragStart($event, placements[index], index)"
+            >
+              {{ placements[index] }}
+            </div>
+            <div v-else class="empty-slot">Drop here</div>
+          </div>
+        </div>
+
+        <div class="items-bank">
+          <div class="bank-label">Drag items from here:</div>
+          <div class="items">
+            <div
+              v-for="item in availableItems"
+              :key="item"
+              class="draggable-item"
+              draggable="true"
+              @dragstart="onDragStart($event, item, null)"
+            >
+              {{ item }}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -38,7 +63,7 @@
     </div>
 
     <div v-if="!revealed" class="card-actions">
-      <button @click="reveal" class="btn btn-primary" :disabled="selectedAnswer === null">
+      <button @click="checkAnswer" class="btn btn-primary" :disabled="!allPlaced">
         Check Answer
       </button>
     </div>
@@ -61,7 +86,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { updateCardSchedule } from '@/utils/spacedRepetition'
 
 const props = defineProps({
@@ -74,25 +99,59 @@ const props = defineProps({
 const emit = defineEmits(['rate'])
 
 const revealed = ref(false)
-const selectedAnswer = ref(null)
+const placements = ref({})
+const draggedItem = ref(null)
+const draggedFromIndex = ref(null)
 
-function selectAnswer(index) {
-  selectedAnswer.value = index
+const targets = computed(() => props.card.targets || [])
+const allItems = computed(() => props.card.items || [])
+
+const availableItems = computed(() => {
+  const placed = Object.values(placements.value)
+  return allItems.value.filter(item => !placed.includes(item))
+})
+
+const allPlaced = computed(() => {
+  return targets.value.every((_, index) => placements.value[index])
+})
+
+onMounted(() => {
+  // Initialize placements
+  placements.value = {}
+})
+
+function onDragStart(event, item, fromIndex) {
+  draggedItem.value = item
+  draggedFromIndex.value = fromIndex
+  event.dataTransfer.effectAllowed = 'move'
 }
 
-function reveal() {
-  if (selectedAnswer.value === null) return
+function onDrop(event, targetIndex) {
+  event.preventDefault()
+
+  // Remove item from previous placement if it was placed
+  if (draggedFromIndex.value !== null) {
+    delete placements.value[draggedFromIndex.value]
+  }
+
+  // Place item in new target
+  placements.value[targetIndex] = draggedItem.value
+
+  // Trigger reactivity
+  placements.value = { ...placements.value }
+
+  draggedItem.value = null
+  draggedFromIndex.value = null
+}
+
+function checkAnswer() {
   revealed.value = true
 }
 
 function rate(rating) {
   emit('rate', rating)
   revealed.value = false
-  selectedAnswer.value = null
-}
-
-function getLetter(index) {
-  return String.fromCharCode(65 + index)
+  placements.value = {}
 }
 
 function getInterval(rating) {
@@ -121,7 +180,7 @@ function getInterval(rating) {
   border-radius: 12px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   padding: 24px;
-  max-width: 700px;
+  max-width: 800px;
   margin: 0 auto;
 }
 
@@ -138,8 +197,8 @@ function getInterval(rating) {
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
-  color: #8b5cf6;
-  background: #f5f3ff;
+  color: #059669;
+  background: #d1fae5;
   padding: 4px 12px;
   border-radius: 12px;
 }
@@ -151,10 +210,10 @@ function getInterval(rating) {
 }
 
 .card-content {
-  min-height: 250px;
+  min-height: 300px;
 }
 
-.scenario {
+.instructions {
   font-size: 16px;
   color: #111827;
   line-height: 1.6;
@@ -162,87 +221,115 @@ function getInterval(rating) {
   padding: 16px;
   background: #f9fafb;
   border-radius: 8px;
-  border-left: 4px solid #8b5cf6;
+  border-left: 4px solid #059669;
+  font-weight: 600;
 }
 
-.options {
+.drag-drop-container {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 24px;
   margin-bottom: 20px;
 }
 
-.option {
+.targets {
   display: flex;
-  align-items: flex-start;
+  flex-direction: column;
   gap: 12px;
-  padding: 14px;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s;
-  background: white;
 }
 
-.option:hover:not(.disabled) {
-  border-color: #8b5cf6;
-  background: #faf5ff;
-}
-
-.option.selected:not(.disabled) {
-  border-color: #8b5cf6;
-  background: #f5f3ff;
-}
-
-.option.correct {
-  border-color: #10b981;
-  background: #d1fae5;
-}
-
-.option.incorrect {
-  border-color: #ef4444;
-  background: #fee2e2;
-}
-
-.option.disabled {
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-
-.option-letter {
+.target-zone {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: #e5e7eb;
+  gap: 12px;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 2px dashed #d1d5db;
+  min-height: 60px;
+}
+
+.target-label {
+  flex: 0 0 200px;
+  font-weight: 600;
   color: #374151;
-  font-weight: 700;
   font-size: 14px;
-  flex-shrink: 0;
 }
 
-.option.selected:not(.disabled) .option-letter {
-  background: #8b5cf6;
-  color: white;
-}
-
-.option.correct .option-letter {
-  background: #10b981;
-  color: white;
-}
-
-.option.incorrect .option-letter {
-  background: #ef4444;
-  color: white;
-}
-
-.option-text {
+.empty-slot {
   flex: 1;
+  text-align: center;
+  color: #9ca3af;
+  font-style: italic;
+  padding: 12px;
+}
+
+.placed-item {
+  flex: 1;
+  padding: 12px 16px;
+  background: #e0e7ff;
+  color: #3730a3;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: grab;
+  transition: all 0.2s;
+}
+
+.placed-item:active {
+  cursor: grabbing;
+}
+
+.placed-item.correct {
+  background: #d1fae5;
+  color: #065f46;
+  border: 2px solid #10b981;
+}
+
+.placed-item.incorrect {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 2px solid #ef4444;
+}
+
+.items-bank {
+  padding: 16px;
+  background: #fffbeb;
+  border-radius: 8px;
+  border: 2px solid #fbbf24;
+}
+
+.bank-label {
   font-size: 14px;
-  color: #374151;
-  line-height: 1.5;
+  font-weight: 600;
+  color: #92400e;
+  margin-bottom: 12px;
+}
+
+.items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.draggable-item {
+  padding: 12px 16px;
+  background: white;
+  border: 2px solid #fbbf24;
+  border-radius: 6px;
+  font-weight: 500;
+  color: #92400e;
+  cursor: grab;
+  transition: all 0.2s;
+}
+
+.draggable-item:hover {
+  background: #fef3c7;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.draggable-item:active {
+  cursor: grabbing;
 }
 
 .explanation {
@@ -330,7 +417,7 @@ function getInterval(rating) {
 }
 
 .btn-primary {
-  background: #8b5cf6;
+  background: #059669;
   color: white;
   padding: 12px 48px;
 }
@@ -338,7 +425,7 @@ function getInterval(rating) {
 .rating-buttons {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  gap: 8px;
 }
 
 .rating-buttons .btn {

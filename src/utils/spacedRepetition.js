@@ -25,33 +25,29 @@ export function updateCardSchedule(card, rating) {
   }
 
   // Calculate new interval and repetitions
+  let nextReview = new Date(now)
+
   if (rating === Rating.AGAIN) {
-    // Restart the card
+    // Need Practice - review again immediately (within same session)
     repetitions = 0
-    interval = 1
-  } else {
+    interval = 0
+    nextReview = new Date(now) // Due now for immediate review
+  } else if (rating === Rating.GOOD) {
+    // Getting It - review in 1 hour
     repetitions += 1
-
-    if (repetitions === 1) {
-      interval = 1
-    } else if (repetitions === 2) {
-      interval = 6
-    } else {
-      // For subsequent reviews, multiply by ease factor
-      interval = Math.round(interval * easeFactor)
-    }
-
-    // Adjust interval based on rating for non-Again ratings
-    if (rating === Rating.HARD) {
-      interval = Math.round(interval * 0.75) // 25% shorter
-    } else if (rating === Rating.EASY) {
-      interval = Math.round(interval * 1.3) // 30% longer
-    }
+    interval = 0.042 // ~1 hour in days (1/24)
+    nextReview.setHours(nextReview.getHours() + 1)
+  } else if (rating === Rating.EASY) {
+    // Know It - review in 1 day
+    repetitions += 1
+    interval = 1
+    nextReview.setDate(nextReview.getDate() + 1)
+  } else {
+    // Fallback for any other ratings
+    repetitions += 1
+    interval = 1
+    nextReview.setDate(nextReview.getDate() + 1)
   }
-
-  // Calculate next review date
-  const nextReview = new Date(now)
-  nextReview.setDate(nextReview.getDate() + interval)
 
   // Update statistics
   const totalReviews = card.totalReviews + 1
@@ -126,8 +122,18 @@ export function getNextCard(cards) {
   const dueCards = getDueCards(cards)
   if (dueCards.length === 0) return null
 
-  // Prioritize cards that are overdue and have lower retention
-  return dueCards.sort((a, b) => {
+  // Shuffle new cards (cards with 0 reviews) to prevent always seeing same ones
+  const newCards = dueCards.filter(c => c.totalReviews === 0)
+  const reviewCards = dueCards.filter(c => c.totalReviews > 0)
+
+  // If there are new cards, shuffle and return a random one
+  if (newCards.length > 0) {
+    const shuffled = [...newCards].sort(() => Math.random() - 0.5)
+    return shuffled[0]
+  }
+
+  // For review cards, prioritize by overdue time and retention
+  return reviewCards.sort((a, b) => {
     const aRetention = getCardRetention(a)
     const bRetention = getCardRetention(b)
     const aOverdue = new Date() - new Date(a.nextReview)

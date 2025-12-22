@@ -30,19 +30,15 @@
 
     <div v-else class="card-actions rating-buttons">
       <button @click="rate(0)" class="btn btn-again">
-        Again
-        <span class="interval">{{ getInterval(0) }}</span>
-      </button>
-      <button @click="rate(1)" class="btn btn-hard">
-        Hard
-        <span class="interval">{{ getInterval(1) }}</span>
+        Need Practice
+        <span class="interval">Review today</span>
       </button>
       <button @click="rate(2)" class="btn btn-good">
-        Good
+        Getting It
         <span class="interval">{{ getInterval(2) }}</span>
       </button>
       <button @click="rate(3)" class="btn btn-easy">
-        Easy
+        Know It
         <span class="interval">{{ getInterval(3) }}</span>
       </button>
     </div>
@@ -220,8 +216,8 @@ function getInterval(rating) {
 
 .rating-buttons {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
 }
 
 .rating-buttons .btn {

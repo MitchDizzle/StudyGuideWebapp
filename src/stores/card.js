@@ -81,15 +81,22 @@ export const useCardStore = defineStore('card', () => {
   }
 
   async function reviewCard(id, rating) {
-    const card = cards.value.find(c => c.id === id)
-    if (!card) return
+    const cardIndex = cards.value.findIndex(c => c.id === id)
+    if (cardIndex === -1) return
 
+    const card = cards.value[cardIndex]
     const updatedCard = updateCardSchedule(card, rating)
-    await db.saveCard(updatedCard)
 
-    const index = cards.value.findIndex(c => c.id === id)
-    cards.value[index] = updatedCard
-    return updatedCard
+    // Convert to plain object for IndexedDB (can't store Vue Proxies)
+    const plainCard = JSON.parse(JSON.stringify(updatedCard))
+
+    // Update in database
+    await db.saveCard(plainCard)
+
+    // Update in local array
+    cards.value[cardIndex] = plainCard
+
+    return plainCard
   }
 
   async function removeCard(id) {
