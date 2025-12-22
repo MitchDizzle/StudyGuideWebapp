@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(npm config get:*)",
+      "Bash(npm config get cache:*)",
+      "Bash(npm config list:*)",
+      "Bash(npm ci:*)",
+      "Bash(curl:*)",
+      "Bash(tasklist:*)",
+      "Bash(netstat:*)"
+    ]
+  }
+}
