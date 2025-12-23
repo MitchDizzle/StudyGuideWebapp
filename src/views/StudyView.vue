@@ -116,6 +116,7 @@ const sessionStats = ref({
 const sessionTimer = ref(null)
 const elapsedSeconds = ref(0)
 const pausedAtSeconds = ref(0)
+const lastBreakTime = ref(0) // Track when last break was suggested
 
 const currentDeck = computed(() => deckStore.currentDeck)
 const dueCards = computed(() => cardStore.dueCards)
@@ -174,9 +175,11 @@ onMounted(async () => {
     if (!paused.value) {
       elapsedSeconds.value = Math.floor((Date.now() - sessionStats.value.startTime) / 1000)
 
-      // Suggest break after 15 minutes
-      if (elapsedSeconds.value >= 900 && !paused.value) { // 15 minutes = 900 seconds
+      // Suggest break every 15 minutes (900 seconds)
+      const timeSinceLastBreak = elapsedSeconds.value - lastBreakTime.value
+      if (timeSinceLastBreak >= 900) {
         pausedAtSeconds.value = elapsedSeconds.value
+        lastBreakTime.value = elapsedSeconds.value
         paused.value = true
       }
     }
