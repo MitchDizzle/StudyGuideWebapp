@@ -10,19 +10,19 @@
 
       <div class="options">
         <div
-          v-for="(option, index) in card.options"
+          v-for="(option, index) in shuffledOptions"
           :key="index"
           class="option"
           :class="{
             'selected': selectedAnswer === index,
-            'correct': revealed && index === card.correctAnswer,
-            'incorrect': revealed && selectedAnswer === index && index !== card.correctAnswer,
+            'correct': revealed && isCorrectOption(index),
+            'incorrect': revealed && selectedAnswer === index && !isCorrectOption(index),
             'disabled': revealed
           }"
           @click="!revealed && selectAnswer(index)"
         >
           <span class="option-letter">{{ getLetter(index) }}</span>
-          <span class="option-text">{{ option }}</span>
+          <span class="option-text">{{ option.text }}</span>
         </div>
       </div>
 
@@ -61,7 +61,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { updateCardSchedule } from '@/utils/spacedRepetition'
 
 const props = defineProps({
@@ -75,9 +75,33 @@ const emit = defineEmits(['rate'])
 
 const revealed = ref(false)
 const selectedAnswer = ref(null)
+const shuffledOptions = ref([])
 
-function selectAnswer(index) {
-  selectedAnswer.value = index
+// Shuffle options when card is loaded
+onMounted(() => {
+  shuffleOptions()
+})
+
+function shuffleOptions() {
+  // Create array of indices with their options
+  const optionsWithIndices = props.card.options.map((option, index) => ({
+    text: option,
+    originalIndex: index
+  }))
+
+  // Shuffle using Fisher-Yates algorithm
+  const shuffled = [...optionsWithIndices]
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+  }
+
+  shuffledOptions.value = shuffled
+}
+
+function selectAnswer(displayIndex) {
+  // Convert display index to original index for comparison
+  selectedAnswer.value = displayIndex
 }
 
 function reveal() {
@@ -89,10 +113,15 @@ function rate(rating) {
   emit('rate', rating)
   revealed.value = false
   selectedAnswer.value = null
+  shuffleOptions() // Reshuffle for next time card appears
 }
 
 function getLetter(index) {
   return String.fromCharCode(65 + index)
+}
+
+function isCorrectOption(displayIndex) {
+  return shuffledOptions.value[displayIndex].originalIndex === props.card.correctAnswer
 }
 
 function getInterval(rating) {

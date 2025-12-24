@@ -102,13 +102,14 @@ const revealed = ref(false)
 const placements = ref({})
 const draggedItem = ref(null)
 const draggedFromIndex = ref(null)
+const shuffledItems = ref([])
 
 const targets = computed(() => props.card.targets || [])
 const allItems = computed(() => props.card.items || [])
 
 const availableItems = computed(() => {
   const placed = Object.values(placements.value)
-  return allItems.value.filter(item => !placed.includes(item))
+  return shuffledItems.value.filter(item => !placed.includes(item))
 })
 
 const allPlaced = computed(() => {
@@ -116,9 +117,20 @@ const allPlaced = computed(() => {
 })
 
 onMounted(() => {
-  // Initialize placements
+  // Initialize placements and shuffle items
   placements.value = {}
+  shuffleItems()
 })
+
+function shuffleItems() {
+  // Fisher-Yates shuffle algorithm
+  const items = [...allItems.value]
+  for (let i = items.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[items[i], items[j]] = [items[j], items[i]]
+  }
+  shuffledItems.value = items
+}
 
 function onDragStart(event, item, fromIndex) {
   draggedItem.value = item
@@ -152,6 +164,7 @@ function rate(rating) {
   emit('rate', rating)
   revealed.value = false
   placements.value = {}
+  shuffleItems() // Reshuffle for next time card appears
 }
 
 function getInterval(rating) {
