@@ -28,20 +28,29 @@ export function updateCardSchedule(card, rating) {
   let nextReview = new Date(now)
 
   if (rating === Rating.AGAIN) {
-    // Need Practice - review again immediately (within same session)
+    // Again - review immediately during this session
     repetitions = 0
     interval = 0
     nextReview = new Date(now) // Due now for immediate review
-  } else if (rating === Rating.GOOD) {
-    // Getting It - review in 1 hour
+  } else if (rating === Rating.LATER_TODAY) {
+    // Later Today - review in 4 hours
     repetitions += 1
-    interval = 0.042 // ~1 hour in days (1/24)
-    nextReview.setHours(nextReview.getHours() + 1)
-  } else if (rating === Rating.EASY) {
-    // Know It - review in 1 day
+    interval = 0.167 // ~4 hours in days (4/24)
+    nextReview.setHours(nextReview.getHours() + 4)
+  } else if (rating === Rating.NEXT_DAY) {
+    // Next Day - review tomorrow at midnight (not 24 hours from now)
     repetitions += 1
     interval = 1
-    nextReview.setDate(nextReview.getDate() + 1)
+    const tomorrow = new Date(now)
+    tomorrow.setDate(tomorrow.getDate() + 1)
+    tomorrow.setHours(0, 0, 0, 0) // Set to midnight
+    nextReview = tomorrow
+  } else if (rating === Rating.KNOW_IT) {
+    // Know It - review in 3 days, extending based on ease factor
+    repetitions += 1
+    const baseDays = 3
+    interval = baseDays * easeFactor
+    nextReview.setDate(nextReview.getDate() + Math.round(interval))
   } else {
     // Fallback for any other ratings
     repetitions += 1
@@ -51,7 +60,7 @@ export function updateCardSchedule(card, rating) {
 
   // Update statistics
   const totalReviews = card.totalReviews + 1
-  const correctReviews = rating >= Rating.GOOD ? card.correctReviews + 1 : card.correctReviews
+  const correctReviews = rating >= Rating.NEXT_DAY ? card.correctReviews + 1 : card.correctReviews
 
   return {
     ...card,

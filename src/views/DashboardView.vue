@@ -5,9 +5,14 @@
         <h1>Dashboard</h1>
         <p>Track your Security+ study progress</p>
       </div>
-      <button @click="startStudy" class="btn btn-primary btn-large">
-        Start Studying
-      </button>
+      <div class="header-actions">
+        <button @click="$router.push('/settings')" class="btn-settings" title="Settings">
+          ⚙️
+        </button>
+        <button @click="startStudy" class="btn btn-primary btn-large">
+          Start Studying
+        </button>
+      </div>
     </div>
 
     <div class="stats-grid">
@@ -124,50 +129,20 @@
       </div>
     </div>
 
-    <div class="actions">
-      <button @click="showExportImport = true" class="btn btn-secondary">
-        Export/Import Data
-      </button>
-      <button @click="resetAllProgress" class="btn btn-secondary">
-        Reset All Progress
-      </button>
-      <button @click="reinitializeDatabase" class="btn btn-warning" style="background: #f59e0b; color: white;">
-        Reinitialize Database (Fix Missing Cards)
-      </button>
-    </div>
-
-    <div v-if="showExportImport" class="modal-overlay" @click="showExportImport = false">
-      <div class="modal" @click.stop>
-        <h2>Export/Import Data</h2>
-        <div class="modal-actions">
-          <button @click="exportData" class="btn btn-primary">Export Data</button>
-          <label class="btn btn-secondary">
-            Import Data
-            <input type="file" @change="importData" accept=".json" style="display: none;">
-          </label>
-        </div>
-        <button @click="showExportImport = false" class="btn btn-text">Close</button>
-      </div>
-    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCardStore } from '@/stores/card'
 import { useStatsStore } from '@/stores/stats'
 import { useDeckStore } from '@/stores/deck'
-import * as db from '@/db'
-import { allSecurityPlusCards } from '@/data/domains'
-import { createDeck } from '@/types'
 
 const router = useRouter()
 const cardStore = useCardStore()
 const statsStore = useStatsStore()
 const deckStore = useDeckStore()
-
-const showExportImport = ref(false)
 
 const cardsDueToday = computed(() => cardStore.cardsDueToday)
 const cardsStudiedToday = computed(() => statsStore.cardsStudiedToday)
@@ -211,124 +186,6 @@ function getRetentionClass(retention) {
   if (retention >= 60) return 'medium'
   return 'low'
 }
-
-async function exportData() {
-  try {
-    const data = await db.exportData()
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `flashcards-export-${new Date().toISOString().split('T')[0]}.json`
-    a.click()
-    URL.revokeObjectURL(url)
-  } catch (error) {
-    console.error('Export failed:', error)
-    alert('Failed to export data')
-  }
-}
-
-async function importData(event) {
-  const file = event.target.files[0]
-  if (!file) return
-
-  try {
-    const text = await file.text()
-    const data = JSON.parse(text)
-    await db.importData(data)
-
-    await Promise.all([
-      cardStore.loadCards(),
-      statsStore.loadReviews(),
-      statsStore.loadSettings(),
-      deckStore.loadDecks()
-    ])
-
-    alert('Data imported successfully!')
-    showExportImport.value = false
-  } catch (error) {
-    console.error('Import failed:', error)
-    alert('Failed to import data. Please check the file format.')
-  }
-}
-
-async function resetAllProgress() {
-  if (!confirm('Reset all card progress? This will mark all cards as new and due for review. Statistics will be preserved.')) {
-    return
-  }
-
-  const now = new Date().toISOString()
-
-  for (const card of cardStore.cards) {
-    const resetCard = {
-      ...card,
-      repetitions: 0,
-      interval: 1,
-      easeFactor: 2.5,
-      nextReview: now,
-      lastReviewed: null,
-      totalReviews: 0,
-      correctReviews: 0,
-      updatedAt: now
-    }
-
-    const plainCard = JSON.parse(JSON.stringify(resetCard))
-    await db.saveCard(plainCard)
-  }
-
-  await cardStore.loadCards()
-  alert('All cards have been reset! All cards are now due for review.')
-}
-
-async function reinitializeDatabase() {
-  if (!confirm(`This will DELETE ALL DATA and recreate the database with all ${allSecurityPlusCards.length} Security+ cards. Your progress and statistics will be lost. Continue?`)) {
-    return
-  }
-
-  console.log('=== Reinitializing Database ===')
-
-  // Clear all data
-  await db.clearAllData()
-  console.log('Database cleared')
-
-  // Reload stores
-  await Promise.all([
-    deckStore.loadDecks(),
-    cardStore.loadCards()
-  ])
-  console.log('Stores reloaded')
-
-  // Create default deck
-  const deck = createDeck({
-    name: 'Security+ SY0-701',
-    description: 'CompTIA Security+ SY0-701 certification study deck',
-    isDefault: true
-  })
-  await deckStore.addDeck(deck)
-  deckStore.setCurrentDeck(deck.id)
-  console.log('Deck created:', deck.name)
-
-  // Add all cards
-  const cards = allSecurityPlusCards.map(cardData => ({
-    ...cardData,
-    deckId: deck.id
-  }))
-
-  await cardStore.addCards(cards)
-  console.log(`Added ${cards.length} cards to database`)
-
-  // Reload everything
-  await Promise.all([
-    cardStore.loadCards(),
-    deckStore.loadDecks()
-  ])
-
-  console.log('Final card count:', cardStore.cards.length)
-  alert(`Database reinitialized with ${cardStore.cards.length} cards!`)
-
-  // Reload page to reset all state
-  window.location.reload()
-}
 </script>
 
 <style scoped>
@@ -355,6 +212,31 @@ async function reinitializeDatabase() {
 .dashboard-header p {
   color: #6b7280;
   margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.btn-settings {
+  background: #f3f4f6;
+  border: none;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.btn-settings:hover {
+  background: #e5e7eb;
+  transform: scale(1.05);
 }
 
 .btn {
@@ -675,49 +557,5 @@ async function reinitializeDatabase() {
 .topic-cards {
   font-size: 12px;
   color: #6b7280;
-}
-
-.actions {
-  display: flex;
-  justify-content: center;
-  gap: 16px;
-}
-
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal {
-  background: white;
-  padding: 32px;
-  border-radius: 12px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-  max-width: 500px;
-  width: 90%;
-}
-
-.modal h2 {
-  margin: 0 0 24px 0;
-  font-size: 24px;
-  color: #111827;
-}
-
-.modal-actions {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 24px;
-}
-
-.modal-actions .btn {
-  flex: 1;
 }
 </style>

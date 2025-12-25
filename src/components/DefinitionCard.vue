@@ -30,11 +30,15 @@
 
     <div v-else class="card-actions rating-buttons">
       <button @click="rate(0)" class="btn btn-again">
-        Need Practice
-        <span class="interval">Review today</span>
+        Again
+        <span class="interval">Now</span>
+      </button>
+      <button @click="rate(1)" class="btn btn-hard">
+        Later Today
+        <span class="interval">{{ getInterval(1) }}</span>
       </button>
       <button @click="rate(2)" class="btn btn-good">
-        Getting It
+        Next Day
         <span class="interval">{{ getInterval(2) }}</span>
       </button>
       <button @click="rate(3)" class="btn btn-easy">
@@ -73,17 +77,30 @@ function getInterval(rating) {
   const updated = updateCardSchedule(props.card, rating)
   const days = updated.interval
 
-  if (days < 1) {
+  // For "Later Today" (rating 1), show hours
+  if (rating === 1) {
+    const hours = Math.round(days * 24)
+    return `${hours}h`
+  }
+
+  // For "Next Day" (rating 2), show <1d since it's midnight (variable time)
+  if (rating === 2) {
     return '<1d'
-  } else if (days === 1) {
+  }
+
+  const roundedDays = Math.round(days)
+
+  if (roundedDays < 1) {
+    return '<1d'
+  } else if (roundedDays === 1) {
     return '1d'
-  } else if (days < 30) {
-    return `${days}d`
-  } else if (days < 365) {
-    const months = Math.round(days / 30)
+  } else if (roundedDays < 30) {
+    return `${roundedDays}d`
+  } else if (roundedDays < 365) {
+    const months = Math.round(roundedDays / 30)
     return `${months}mo`
   } else {
-    const years = Math.round(days / 365)
+    const years = Math.round(roundedDays / 365)
     return `${years}y`
   }
 }
@@ -216,7 +233,7 @@ function getInterval(rating) {
 
 .rating-buttons {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 12px;
 }
 

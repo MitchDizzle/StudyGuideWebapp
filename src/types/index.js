@@ -19,10 +19,10 @@ export const Difficulty = {
 }
 
 export const Rating = {
-  AGAIN: 0,
-  HARD: 1,
-  GOOD: 2,
-  EASY: 3
+  AGAIN: 0,        // Review during this session
+  LATER_TODAY: 1,  // See later today (4 hours)
+  NEXT_DAY: 2,     // See next day (tomorrow at midnight)
+  KNOW_IT: 3       // Know it well (3+ days)
 }
 
 /**
