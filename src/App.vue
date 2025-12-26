@@ -4,11 +4,14 @@
       <div class="nav-content">
         <router-link to="/" class="nav-brand">
           <span class="logo">🎓</span>
-          <span class="brand-text">Security+ Flashcards</span>
+          <span class="brand-text">CompTIA Study Guide</span>
         </router-link>
         <div class="nav-links">
           <router-link to="/" class="nav-link">Dashboard</router-link>
           <router-link to="/study" class="nav-link">Study</router-link>
+          <router-link to="/settings" class="nav-link nav-link-icon" title="Settings">
+            ⚙️
+          </router-link>
         </div>
       </div>
     </nav>
@@ -18,18 +21,68 @@
     </main>
 
     <footer class="footer">
-      <p>Security+ SY0-701 Study App | Built with Vue 3</p>
+      <p>CompTIA Study App | Built with Vue 3</p>
     </footer>
+
+    <WelcomeModal
+      :show="showWelcomeModal"
+      :available-packs="availablePacks"
+      @select="handlePackSelection"
+    />
   </div>
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { initializeApp } from '@/utils/initialize'
+import { usePackStore } from '@/stores/pack'
+import { availablePacks } from '@/data/packs'
+import WelcomeModal from '@/components/WelcomeModal.vue'
+
+const packStore = usePackStore()
+const showWelcomeModal = ref(false)
 
 onMounted(async () => {
+  // Initialize app (this loads pack settings)
   await initializeApp()
+
+  // After initialization, check if any packs are enabled
+  // packStore.enabledPackIds is already loaded by initializeApp
+  console.log('Checking enabled packs after init:', packStore.enabledPackIds)
+
+  // Only show modal if no packs are enabled
+  if (packStore.enabledPackIds.length === 0) {
+    console.log('No packs enabled - showing welcome modal')
+    showWelcomeModal.value = true
+  } else {
+    console.log('Packs are enabled:', packStore.enabledPackIds)
+  }
 })
+
+async function handlePackSelection(selectedPackIds) {
+  console.log('User selected packs:', selectedPackIds)
+
+  try {
+    // Enable the selected packs
+    for (const packId of selectedPackIds) {
+      console.log('Enabling pack:', packId)
+      await packStore.enablePack(packId)
+    }
+
+    console.log('All packs enabled, closing modal')
+    // Hide modal after successful save
+    showWelcomeModal.value = false
+
+    console.log('Reloading page in 100ms...')
+    // Small delay then reload to show the new packs
+    setTimeout(() => {
+      window.location.reload()
+    }, 100)
+  } catch (error) {
+    console.error('Error enabling packs:', error)
+    alert('Failed to enable packs. Please try again.')
+  }
+}
 </script>
 
 <style>
@@ -114,6 +167,11 @@ body {
 .nav-link.router-link-active {
   color: #6366f1;
   background: #eef2ff;
+}
+
+.nav-link-icon {
+  font-size: 20px;
+  padding: 8px 12px;
 }
 
 .main-content {

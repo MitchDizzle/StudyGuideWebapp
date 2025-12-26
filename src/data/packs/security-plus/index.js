@@ -1,3 +1,4 @@
+import { securityPlusPack } from './pack'
 import { threatsCards } from './threats'
 import { architectureCards } from './architecture'
 import { implementationCards } from './implementation'
@@ -12,6 +13,9 @@ export const allSecurityPlusCards = [
   ...operationsCards,
   ...governanceCards
 ]
+
+// Export pack metadata
+export { securityPlusPack }
 
 // Export individual domains for domain-specific loading
 export {

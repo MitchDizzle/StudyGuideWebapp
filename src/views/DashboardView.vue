@@ -3,18 +3,25 @@
     <div class="dashboard-header">
       <div>
         <h1>Dashboard</h1>
-        <p>Track your Security+ study progress</p>
+        <p>Track your study progress</p>
       </div>
-      <div class="header-actions">
-        <button @click="$router.push('/settings')" class="btn-settings" title="Settings">
-          ⚙️
-        </button>
+      <div class="header-actions" v-if="enabledPacks.length > 0">
         <button @click="startStudy" class="btn btn-primary btn-large">
           Start Studying
         </button>
       </div>
     </div>
 
+    <div v-if="enabledPacks.length === 0" class="no-packs-message">
+      <div class="no-packs-icon">📦</div>
+      <h2>No Study Packs Enabled</h2>
+      <p>Get started by enabling study packs in the settings.</p>
+      <button @click="$router.push('/settings')" class="btn btn-primary btn-large">
+        Go to Settings
+      </button>
+    </div>
+
+    <template v-else>
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-icon" style="background: #dbeafe; color: #1e40af;">📚</div>
@@ -111,6 +118,22 @@
       </div>
     </div>
 
+    <div class="active-packs" v-if="enabledPacks.length > 0">
+      <h3>Active Study Packs</h3>
+      <div class="pack-list">
+        <div v-for="pack in enabledPacks" :key="pack.id" class="pack-item">
+          <div class="pack-icon">📦</div>
+          <div class="pack-info">
+            <div class="pack-name">{{ pack.name }}</div>
+            <div class="pack-description">{{ pack.description }}</div>
+          </div>
+          <div class="pack-stats">
+            <div class="pack-count">{{ pack.cardCount }} cards</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="weak-topics" v-if="weakTopics.length > 0">
       <h3>Topics Needing Practice</h3>
       <div class="topic-list">
@@ -128,6 +151,7 @@
         </div>
       </div>
     </div>
+    </template>
 
   </div>
 </template>
@@ -138,11 +162,13 @@ import { useRouter } from 'vue-router'
 import { useCardStore } from '@/stores/card'
 import { useStatsStore } from '@/stores/stats'
 import { useDeckStore } from '@/stores/deck'
+import { usePackStore } from '@/stores/pack'
 
 const router = useRouter()
 const cardStore = useCardStore()
 const statsStore = useStatsStore()
 const deckStore = useDeckStore()
+const packStore = usePackStore()
 
 const cardsDueToday = computed(() => cardStore.cardsDueToday)
 const cardsStudiedToday = computed(() => statsStore.cardsStudiedToday)
@@ -153,9 +179,11 @@ const dailyProgress = computed(() => statsStore.dailyProgress)
 const accuracyData = computed(() => statsStore.accuracyOverTime)
 const domainStats = computed(() => statsStore.domainStats)
 const weakTopics = computed(() => statsStore.weakTopics)
+const enabledPacks = computed(() => packStore.enabledPacks)
 
 onMounted(async () => {
   await Promise.all([
+    packStore.loadSettings(),
     cardStore.loadCards(),
     statsStore.loadReviews(),
     statsStore.loadSessions(),
@@ -220,23 +248,31 @@ function getRetentionClass(retention) {
   align-items: center;
 }
 
-.btn-settings {
-  background: #f3f4f6;
-  border: none;
-  border-radius: 50%;
-  width: 48px;
-  height: 48px;
-  font-size: 24px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
+.no-packs-message {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 64px 32px;
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
-.btn-settings:hover {
-  background: #e5e7eb;
-  transform: scale(1.05);
+.no-packs-icon {
+  font-size: 80px;
+  margin-bottom: 24px;
+}
+
+.no-packs-message h2 {
+  font-size: 28px;
+  color: #111827;
+  margin-bottom: 12px;
+}
+
+.no-packs-message p {
+  font-size: 16px;
+  color: #6b7280;
+  margin-bottom: 32px;
 }
 
 .btn {
@@ -557,5 +593,76 @@ function getRetentionClass(retention) {
 .topic-cards {
   font-size: 12px;
   color: #6b7280;
+}
+
+.active-packs {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 32px;
+}
+
+.active-packs h3 {
+  margin: 0 0 20px 0;
+  font-size: 18px;
+  color: #111827;
+}
+
+.pack-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pack-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 8px;
+  border-left: 4px solid #6366f1;
+}
+
+.pack-icon {
+  font-size: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+}
+
+.pack-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pack-name {
+  font-weight: 600;
+  color: #111827;
+  font-size: 16px;
+}
+
+.pack-description {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.pack-stats {
+  display: flex;
+  align-items: center;
+}
+
+.pack-count {
+  font-size: 14px;
+  font-weight: 600;
+  color: #6366f1;
+  background: #eef2ff;
+  padding: 6px 12px;
+  border-radius: 6px;
 }
 </style>

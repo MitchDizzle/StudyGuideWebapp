@@ -9,6 +9,50 @@
 
     <div class="settings-content">
       <div class="settings-section">
+        <h2>Study Packs</h2>
+        <p class="section-description">Enable or disable study packs to customize your learning</p>
+
+        <div class="pack-toggles">
+          <div v-for="pack in allPacks" :key="pack.id" class="pack-toggle">
+            <div class="pack-toggle-info">
+              <div class="pack-toggle-icon">📦</div>
+              <div>
+                <div class="pack-toggle-name">{{ pack.name }}</div>
+                <div class="pack-toggle-description">{{ pack.description }}</div>
+                <div class="pack-toggle-count">{{ pack.cardCount }} cards</div>
+              </div>
+            </div>
+            <label class="toggle-switch">
+              <input
+                type="checkbox"
+                :checked="isPackEnabled(pack.id)"
+                @change="togglePack(pack.id)"
+              />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h2>Study Settings</h2>
+        <p class="section-description">Customize your study experience</p>
+
+        <div class="setting-item">
+          <label for="dailyGoal">Daily Goal (cards per day)</label>
+          <input
+            id="dailyGoal"
+            type="number"
+            v-model.number="dailyGoal"
+            @change="updateDailyGoal"
+            min="1"
+            max="200"
+            class="input"
+          />
+        </div>
+      </div>
+
+      <div class="settings-section">
         <h2>Data Management</h2>
         <p class="section-description">Export, import, or reset your study data</p>
 
@@ -53,52 +97,52 @@
           </div>
         </div>
       </div>
-
-      <div class="settings-section">
-        <h2>Study Settings</h2>
-        <p class="section-description">Customize your study experience</p>
-
-        <div class="setting-item">
-          <label for="dailyGoal">Daily Goal (cards per day)</label>
-          <input
-            id="dailyGoal"
-            type="number"
-            v-model.number="dailyGoal"
-            @change="updateDailyGoal"
-            min="1"
-            max="200"
-            class="input"
-          />
-        </div>
-      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCardStore } from '@/stores/card'
 import { useStatsStore } from '@/stores/stats'
 import { useDeckStore } from '@/stores/deck'
+import { usePackStore } from '@/stores/pack'
 import * as db from '@/db'
-import { allSecurityPlusCards } from '@/data/domains'
+import { availablePacks, getEnabledCards } from '@/data/packs'
 import { createDeck } from '@/types'
 
 const router = useRouter()
 const cardStore = useCardStore()
 const statsStore = useStatsStore()
 const deckStore = useDeckStore()
+const packStore = usePackStore()
 
 const dailyGoal = ref(20)
+const allPacks = computed(() => packStore.allPacks)
 
 onMounted(async () => {
-  await statsStore.loadSettings()
+  await Promise.all([
+    statsStore.loadSettings(),
+    packStore.loadSettings()
+  ])
   dailyGoal.value = statsStore.dailyGoal
 })
 
 async function updateDailyGoal() {
   await statsStore.updateDailyGoal(dailyGoal.value)
+}
+
+function isPackEnabled(packId) {
+  return packStore.isPackEnabled(packId)
+}
+
+async function togglePack(packId) {
+  const success = await packStore.togglePack(packId)
+  if (success) {
+    // Reload cards to reflect the change
+    await cardStore.loadCards()
+  }
 }
 
 async function exportData() {
@@ -169,7 +213,9 @@ async function resetAllProgress() {
 }
 
 async function reinitializeDatabase() {
-  if (!confirm(`This will DELETE ALL DATA and recreate the database with all ${allSecurityPlusCards.length} Security+ cards. Your progress and statistics will be lost. Continue?`)) {
+  const allAvailableCards = getEnabledCards()
+
+  if (!confirm(`This will DELETE ALL DATA and recreate the database with all ${allAvailableCards.length} cards from ${availablePacks.length} pack(s). Your progress and statistics will be lost. Continue?`)) {
     return
   }
 
@@ -186,24 +232,33 @@ async function reinitializeDatabase() {
   ])
   console.log('Stores reloaded')
 
-  // Create default deck
-  const deck = createDeck({
-    name: 'Security+ SY0-701',
-    description: 'CompTIA Security+ SY0-701 certification study deck',
-    isDefault: true
-  })
-  await deckStore.addDeck(deck)
-  deckStore.setCurrentDeck(deck.id)
-  console.log('Deck created:', deck.name)
+  // Create decks for each available pack
+  let totalCards = 0
+  for (const pack of availablePacks) {
+    const deck = createDeck({
+      name: pack.name,
+      description: pack.description,
+      isDefault: pack.isDefault || false
+    })
+    await deckStore.addDeck(deck)
 
-  // Add all cards
-  const cards = allSecurityPlusCards.map(cardData => ({
-    ...cardData,
-    deckId: deck.id
-  }))
+    if (pack.isDefault) {
+      deckStore.setCurrentDeck(deck.id)
+    }
 
-  await cardStore.addCards(cards)
-  console.log(`Added ${cards.length} cards to database`)
+    console.log('Deck created:', deck.name)
+
+    // Add all cards from this pack
+    const cards = pack.cards.map(cardData => ({
+      ...cardData,
+      deckId: deck.id,
+      packId: pack.id
+    }))
+
+    await cardStore.addCards(cards)
+    totalCards += cards.length
+    console.log(`Added ${cards.length} cards from ${pack.name}`)
+  }
 
   // Reload everything
   await Promise.all([
@@ -212,7 +267,7 @@ async function reinitializeDatabase() {
   ])
 
   console.log('Final card count:', cardStore.cards.length)
-  alert(`Database reinitialized with ${cardStore.cards.length} cards!`)
+  alert(`Database reinitialized with ${totalCards} cards from ${availablePacks.length} pack(s)!`)
 
   // Reload page to reset all state
   window.location.reload()
@@ -393,5 +448,108 @@ async function reinitializeDatabase() {
 .input:focus {
   outline: none;
   border-color: #6366f1;
+}
+
+.pack-toggles {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pack-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  transition: all 0.2s;
+}
+
+.pack-toggle:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.pack-toggle-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.pack-toggle-icon {
+  font-size: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pack-toggle-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.pack-toggle-description {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.pack-toggle-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6366f1;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 56px;
+  height: 28px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #cbd5e1;
+  transition: 0.3s;
+  border-radius: 28px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+  background-color: #6366f1;
+}
+
+input:checked + .toggle-slider:before {
+  transform: translateX(28px);
+}
+
+input:disabled + .toggle-slider {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 </style>

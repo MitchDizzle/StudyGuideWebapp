@@ -163,6 +163,26 @@ export async function saveSetting(key, value) {
   return database.put('settings', { key, value })
 }
 
+export async function getSettings() {
+  const database = await initDB()
+  const allSettings = await database.getAll('settings')
+  // Convert array of {key, value} to object
+  return allSettings.reduce((acc, { key, value }) => {
+    acc[key] = value
+    return acc
+  }, {})
+}
+
+export async function saveSettings(settingsObj) {
+  const database = await initDB()
+  const tx = database.transaction('settings', 'readwrite')
+  const promises = Object.entries(settingsObj).map(([key, value]) =>
+    tx.store.put({ key, value })
+  )
+  promises.push(tx.done)
+  await Promise.all(promises)
+}
+
 // Bulk operations
 export async function exportData() {
   const database = await initDB()
