@@ -138,11 +138,12 @@ function isPackEnabled(packId) {
 }
 
 async function togglePack(packId) {
-  const success = await packStore.togglePack(packId)
-  if (success) {
-    // Reload cards to reflect the change
-    await cardStore.loadCards()
-  }
+  await packStore.togglePack(packId)
+
+  // Simple solution: reload the page to reinitialize everything
+  setTimeout(() => {
+    window.location.reload()
+  }, 100)
 }
 
 async function exportData() {
@@ -213,17 +214,30 @@ async function resetAllProgress() {
 }
 
 async function reinitializeDatabase() {
-  const allAvailableCards = getEnabledCards()
+  // Get enabled pack IDs
+  const enabledPackIds = packStore.enabledPackIds
+  const allAvailableCards = getEnabledCards(enabledPackIds)
 
-  if (!confirm(`This will DELETE ALL DATA and recreate the database with all ${allAvailableCards.length} cards from ${availablePacks.length} pack(s). Your progress and statistics will be lost. Continue?`)) {
+  if (!confirm(`This will DELETE ALL DATA and recreate the database with ${allAvailableCards.length} cards from ${enabledPackIds.length} enabled pack(s). Your progress and statistics will be lost. Continue?`)) {
     return
   }
 
   console.log('=== Reinitializing Database ===')
+  console.log('Enabled packs:', enabledPackIds)
 
   // Clear all data
   await db.clearAllData()
   console.log('Database cleared')
+
+  // Reload pack settings (they were cleared, so restore them)
+  await packStore.loadSettings()
+
+  // If no packs are enabled after reload, we're done
+  if (packStore.enabledPackIds.length === 0) {
+    alert('Database cleared. Please enable packs in settings.')
+    window.location.reload()
+    return
+  }
 
   // Reload stores
   await Promise.all([
@@ -232,9 +246,11 @@ async function reinitializeDatabase() {
   ])
   console.log('Stores reloaded')
 
-  // Create decks for each available pack
+  // Create decks for ONLY enabled packs
+  const enabledPacks = availablePacks.filter(pack => packStore.enabledPackIds.includes(pack.id))
   let totalCards = 0
-  for (const pack of availablePacks) {
+
+  for (const pack of enabledPacks) {
     const deck = createDeck({
       name: pack.name,
       description: pack.description,
@@ -242,7 +258,7 @@ async function reinitializeDatabase() {
     })
     await deckStore.addDeck(deck)
 
-    if (pack.isDefault) {
+    if (pack.isDefault || enabledPacks.length === 1) {
       deckStore.setCurrentDeck(deck.id)
     }
 
@@ -267,7 +283,7 @@ async function reinitializeDatabase() {
   ])
 
   console.log('Final card count:', cardStore.cards.length)
-  alert(`Database reinitialized with ${totalCards} cards from ${availablePacks.length} pack(s)!`)
+  alert(`Database reinitialized with ${totalCards} cards from ${enabledPacks.length} enabled pack(s)!`)
 
   // Reload page to reset all state
   window.location.reload()

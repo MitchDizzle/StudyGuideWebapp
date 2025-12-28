@@ -15,14 +15,9 @@ export const usePackStore = defineStore('pack', () => {
 
   // Actions
   async function loadSettings() {
-    console.log('Loading pack settings...')
     const settings = await db.getSettings()
-    console.log('Retrieved settings from DB:', settings)
     if (settings?.enabledPacks) {
-      console.log('Setting enabled packs to:', settings.enabledPacks)
       enabledPackIds.value = settings.enabledPacks
-    } else {
-      console.log('No enabledPacks found in settings, using default empty array')
     }
   }
 
@@ -57,9 +52,7 @@ export const usePackStore = defineStore('pack', () => {
     const settings = await db.getSettings() || {}
     // Create a plain array copy to avoid Proxy serialization issues
     settings.enabledPacks = [...enabledPackIds.value]
-    console.log('Saving pack settings:', settings.enabledPacks)
     await db.saveSettings(settings)
-    console.log('Pack settings saved successfully')
   }
 
   function isPackEnabled(packId) {

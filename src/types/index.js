@@ -43,7 +43,8 @@ export function createCard({
   domain = Domain.THREATS,
   topic = '',
   difficulty = Difficulty.MEDIUM,
-  deckId = null
+  deckId = null,
+  packId = null
 } = {}) {
   return {
     id,
@@ -61,6 +62,7 @@ export function createCard({
     topic,
     difficulty,
     deckId,
+    packId,
     // Spaced repetition fields (SM-2 algorithm)
     repetitions: 0,
     interval: 1,

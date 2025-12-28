@@ -181,17 +181,18 @@ const domainStats = computed(() => statsStore.domainStats)
 const weakTopics = computed(() => statsStore.weakTopics)
 const enabledPacks = computed(() => packStore.enabledPacks)
 
-onMounted(async () => {
+async function loadDashboardData() {
   await Promise.all([
-    packStore.loadSettings(),
-    cardStore.loadCards(),
     statsStore.loadReviews(),
     statsStore.loadSessions(),
-    statsStore.loadSettings(),
-    deckStore.loadDecks()
+    statsStore.loadSettings()
   ])
 
   await statsStore.updateStreak()
+}
+
+onMounted(async () => {
+  await loadDashboardData()
 })
 
 function startStudy() {

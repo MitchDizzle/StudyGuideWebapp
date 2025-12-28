@@ -21,17 +21,15 @@ export async function initializeApp() {
   // Get all cards from enabled packs
   const allAvailableCards = getEnabledCards(packStore.enabledPackIds)
 
-  console.log('=== App Initialization ===')
-  console.log('Available packs:', availablePacks.length)
-  console.log('Decks in database:', deckStore.decks.length)
-  console.log('Cards in database:', cardStore.cards.length)
-  console.log('All available cards:', allAvailableCards.length)
+  console.log(`📚 Initialized: ${packStore.enabledPackIds.length} pack(s) enabled, ${deckStore.decks.length} deck(s), ${cardStore.cards.length} card(s) loaded`)
 
   if (deckStore.decks.length === 0) {
-    console.log('No decks found. Initializing default packs...')
+    console.log('No decks found. Initializing enabled packs...')
 
-    // Initialize decks for each available pack
-    for (const pack of availablePacks) {
+    // Only initialize decks for enabled packs
+    const enabledPacks = availablePacks.filter(pack => packStore.enabledPackIds.includes(pack.id))
+
+    for (const pack of enabledPacks) {
       const deck = createDeck({
         name: pack.name,
         description: pack.description,
@@ -39,7 +37,7 @@ export async function initializeApp() {
       })
       await deckStore.addDeck(deck)
 
-      if (pack.isDefault) {
+      if (pack.isDefault || enabledPacks.length === 1) {
         deckStore.setCurrentDeck(deck.id)
       }
 
@@ -50,18 +48,13 @@ export async function initializeApp() {
       }))
 
       await cardStore.addCards(cards)
-      console.log(`Initialized ${pack.name} with ${cards.length} cards`)
     }
   } else {
-    console.log('Existing deck found. Loading cards...')
     const defaultDeck = deckStore.defaultDeck || deckStore.decks[0]
     deckStore.setCurrentDeck(defaultDeck.id)
 
     // Check if we need to add missing cards
     if (cardStore.cards.length < allAvailableCards.length) {
-      console.warn(`WARNING: Only ${cardStore.cards.length} of ${allAvailableCards.length} cards found in database!`)
-      console.log('Adding missing cards...')
-
       const existingCardFronts = new Set(cardStore.cards.map(c => c.front))
       const missingCards = allAvailableCards.filter(c => !existingCardFronts.has(c.front))
 
@@ -71,10 +64,8 @@ export async function initializeApp() {
           deckId: defaultDeck.id
         }))
         await cardStore.addCards(cardsToAdd)
-        console.log(`Added ${cardsToAdd.length} missing cards`)
+        console.log(`✨ Added ${cardsToAdd.length} missing cards`)
       }
     }
-
-    console.log(`Final card count: ${cardStore.cards.length}`)
   }
 }

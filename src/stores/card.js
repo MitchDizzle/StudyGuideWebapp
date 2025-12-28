@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import * as db from '@/db'
 import { createCard } from '@/types'
 import { updateCardSchedule, getDueCards, getCardsDueToday, getNextCard } from '@/utils/spacedRepetition'
+import { usePackStore } from '@/stores/pack'
 
 export const useCardStore = defineStore('card', () => {
   const cards = ref([])
@@ -42,7 +43,26 @@ export const useCardStore = defineStore('card', () => {
   async function loadCards() {
     loading.value = true
     try {
-      cards.value = await db.getAllCards()
+      const allCards = await db.getAllCards()
+      const packStore = usePackStore()
+
+      // Only load cards from enabled packs
+      if (packStore.enabledPackIds.length > 0) {
+        cards.value = allCards.filter(card =>
+          card.packId && packStore.enabledPackIds.includes(card.packId)
+        )
+        console.log(`Loaded ${cards.value.length} cards from ${packStore.enabledPackIds.length} enabled pack(s)`)
+
+        // Count cards without packId (only warn if there are any)
+        const cardsWithoutPackId = allCards.filter(card => !card.packId).length
+        if (cardsWithoutPackId > 0) {
+          console.warn(`⚠️ Found ${cardsWithoutPackId} cards without packId - use "Reinitialize Database" in Settings to fix`)
+        }
+      } else {
+        // No packs enabled, show no cards
+        cards.value = []
+        console.log('No packs enabled - no cards loaded')
+      }
     } catch (error) {
       console.error('Failed to load cards:', error)
     } finally {

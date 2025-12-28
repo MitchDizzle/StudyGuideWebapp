@@ -46,34 +46,22 @@ onMounted(async () => {
   // Initialize app (this loads pack settings)
   await initializeApp()
 
-  // After initialization, check if any packs are enabled
-  // packStore.enabledPackIds is already loaded by initializeApp
-  console.log('Checking enabled packs after init:', packStore.enabledPackIds)
-
   // Only show modal if no packs are enabled
   if (packStore.enabledPackIds.length === 0) {
-    console.log('No packs enabled - showing welcome modal')
     showWelcomeModal.value = true
-  } else {
-    console.log('Packs are enabled:', packStore.enabledPackIds)
   }
 })
 
 async function handlePackSelection(selectedPackIds) {
-  console.log('User selected packs:', selectedPackIds)
-
   try {
     // Enable the selected packs
     for (const packId of selectedPackIds) {
-      console.log('Enabling pack:', packId)
       await packStore.enablePack(packId)
     }
 
-    console.log('All packs enabled, closing modal')
     // Hide modal after successful save
     showWelcomeModal.value = false
 
-    console.log('Reloading page in 100ms...')
     // Small delay then reload to show the new packs
     setTimeout(() => {
       window.location.reload()
