@@ -1,32 +1,57 @@
-# Security+ Flashcards
+# CompTIA Study Guide
 
-A Security+ study app with spaced repetition, scenario cards, and progress analytics.
+A comprehensive study app for CompTIA certifications with spaced repetition, multiple card types, and detailed progress analytics.
 
-## Why This Exists
+## Overview
 
-Most flashcard apps are polite little index cards. This one is a slightly stricter teacher.
-
-**Flashcards** is a web app designed to help you learn certification content faster (starting with CompTIA Security+ SY0-701) using:
-
-- **Spaced repetition** (review weak cards more often)
-- **Active recall** (typing answers, not just flipping)
-- **Exam-style scenarios** (CompTIA flavor questions)
-- **Progress tracking by domain** (so you know what's leaking)
-
-This project is also a portfolio piece to showcase modern web development practices in Vue: component architecture, state management, persistence, analytics, and clean UX.
+This web-based flashcard application helps you master CompTIA certification content using proven learning techniques. Built with Vue 3 and designed for efficient studying with offline support.
 
 ## Features
 
-- 📚 Default Security+ SY0-701 deck with cards organized by domain
-- 🧠 Spaced repetition algorithm (SM-2) for optimal learning
-- ✍️ Active recall with typed answers
-- 📊 Progress dashboard with analytics
-- 🎯 Domain and topic tracking
-- 💾 Offline-first with IndexedDB persistence
-- 📥 Export/import decks as JSON
-- 🔥 Daily goals and streak tracking
+### 📦 Multiple Study Packs
+- **Security+ SY0-701**: Complete coverage across all 5 domains
+  - Threats, Attacks, and Vulnerabilities
+  - Architecture and Design
+  - Implementation
+  - Operations and Incident Response
+  - Governance, Risk, and Compliance
+- **Network+ N10-008**: Networking fundamentals and concepts
+- Enable/disable packs based on what you're studying
+
+### 🎴 Interactive Card Types
+- **Definition Cards**: Traditional term-to-definition flashcards
+- **Scenario Cards**: Multiple-choice questions with detailed explanations
+- **Drag & Drop Cards**: Interactive matching and ordering exercises
+
+### 🧠 Smart Learning Features
+- **Spaced Repetition (SM-2)**: Cards you struggle with appear more frequently
+- **Active Recall**: Type answers instead of passive review
+- **Progress Tracking**: Monitor accuracy and retention by domain and topic
+- **Daily Goals**: Set and track daily study targets
+- **Streak Tracking**: Build study habits with day streaks
+- **Study Breaks**: Automatic break reminders every 15 minutes
+
+### 📊 Analytics Dashboard
+- Cards due today vs cards studied
+- Accuracy over time (30-day chart)
+- Domain-by-domain breakdown with retention rates
+- Weak topics identification
+- Session statistics (time, cards studied, accuracy)
+
+### 💾 Data Management
+- **Offline-First**: Works without internet using IndexedDB
+- **Export/Import**: Backup and restore your progress as JSON
+- **Reset Progress**: Start fresh while keeping statistics
+- **Multi-Pack Support**: Study multiple certifications simultaneously
+
+### ⚙️ Customizable Settings
+- Adjustable daily goals
+- Enable/disable specific study packs
+- Per-pack statistics and tracking
 
 ## Getting Started
+
+### Installation
 
 ```bash
 # Install dependencies
@@ -39,23 +64,25 @@ npm run dev
 npm run build
 ```
 
+### Deployment
+
+This app is configured to work in any subfolder without modification. Simply build and upload the `dist` folder contents to your web server.
+
+URLs will use hash-based routing (e.g., `/#/study`) for maximum compatibility.
+
 ## Tech Stack
 
-- Vue 3 (Composition API)
-- Pinia (State Management)
-- Vue Router
-- IndexedDB (via idb)
-- Vite
+- **Vue 3** (Composition API)
+- **Pinia** (State Management)
+- **Vue Router** (Hash-based routing for portability)
+- **IndexedDB** (via idb library for offline persistence)
+- **Vite** (Build tool and dev server)
 
-## Card Types
+## Card Rating System
 
-1. **Definition Cards**: Term ↔ Definition
-2. **Scenario Cards**: Scenario → Best answer + explanation
+The spaced repetition algorithm uses 4 rating options:
 
-## Spaced Repetition
-
-Cards are scheduled using a modified SM-2 algorithm:
-- **Again**: Card shown again soon
-- **Hard**: Longer interval, but not as long as Good
-- **Good**: Standard interval increase
-- **Easy**: Significantly longer interval
+- **Again**: Card shown again soon (resets interval)
+- **Hard**: Longer interval, but conservative
+- **Good**: Standard interval increase (optimal retention)
+- **Easy**: Significantly longer interval (mastered content)
