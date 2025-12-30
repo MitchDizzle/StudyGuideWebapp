@@ -4,7 +4,7 @@
       <div class="nav-content">
         <router-link to="/" class="nav-brand">
           <span class="logo">🎓</span>
-          <span class="brand-text">CompTIA Study Guide</span>
+          <span class="brand-text">Study Packs</span>
         </router-link>
         <div class="nav-links">
           <router-link to="/" class="nav-link">Dashboard</router-link>
@@ -21,7 +21,7 @@
     </main>
 
     <footer class="footer">
-      <p>CompTIA Study App | Built with Vue 3</p>
+      <p>Study Packs | Built with Vue 3</p>
     </footer>
 
     <WelcomeModal

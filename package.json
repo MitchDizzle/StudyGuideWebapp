@@ -1,6 +1,7 @@
 {
-  "name": "security-plus-flashcards",
+  "name": "study-packs",
   "version": "1.0.0",
+  "description": "A modular study app with spaced repetition, multiple card types, and progress analytics",
   "type": "module",
   "scripts": {
     "dev": "vite",

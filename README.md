@@ -1,22 +1,24 @@
-# CompTIA Study Guide
+# Study Packs
 
-A comprehensive study app for CompTIA certifications with spaced repetition, multiple card types, and detailed progress analytics.
+A modular study app with spaced repetition, multiple card types, and detailed progress analytics. Learn anything with adaptive flashcards.
 
 ## Overview
 
-This web-based flashcard application helps you master CompTIA certification content using proven learning techniques. Built with Vue 3 and designed for efficient studying with offline support.
+Study Packs is a flexible, web-based flashcard application built on a modular pack system. Study any subject using proven learning techniques including spaced repetition, active recall, and progress tracking. Built with Vue 3 with offline-first design.
+
+**Currently includes:** CompTIA Security+ SY0-701 and Network+ N10-008 certification study packs.
 
 ## Features
 
-### 📦 Multiple Study Packs
-- **Security+ SY0-701**: Complete coverage across all 5 domains
-  - Threats, Attacks, and Vulnerabilities
-  - Architecture and Design
-  - Implementation
-  - Operations and Incident Response
-  - Governance, Risk, and Compliance
+### 📦 Modular Pack System
+- Study multiple topics simultaneously
+- Enable/disable packs based on what you're learning
+- Each pack maintains independent progress and statistics
+- Easy to extend with new subject matter
+
+**Included Packs:**
+- **Security+ SY0-701**: Complete coverage across all 5 domains (Threats, Architecture, Implementation, Operations, Governance)
 - **Network+ N10-008**: Networking fundamentals and concepts
-- Enable/disable packs based on what you're studying
 
 ### 🎴 Interactive Card Types
 - **Definition Cards**: Traditional term-to-definition flashcards
@@ -42,7 +44,7 @@ This web-based flashcard application helps you master CompTIA certification cont
 - **Offline-First**: Works without internet using IndexedDB
 - **Export/Import**: Backup and restore your progress as JSON
 - **Reset Progress**: Start fresh while keeping statistics
-- **Multi-Pack Support**: Study multiple certifications simultaneously
+- **Multi-Pack Support**: Study multiple topics simultaneously
 
 ### ⚙️ Customizable Settings
 - Adjustable daily goals
