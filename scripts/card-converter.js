@@ -176,14 +176,6 @@ async function jsToCSV(inputPath, outputPath) {
   DRAGDROP: 'dragdrop'
 };
 
-export const Domain = {
-  THREATS: 'Threats, Attacks, and Vulnerabilities',
-  ARCHITECTURE: 'Architecture and Design',
-  IMPLEMENTATION: 'Implementation',
-  OPERATIONS: 'Operations and Incident Response',
-  GOVERNANCE: 'Governance, Risk, and Compliance'
-};
-
 export const Difficulty = {
   EASY: 'easy',
   MEDIUM: 'medium',
@@ -207,11 +199,21 @@ export const Difficulty = {
     // Import the modified file
     const module = await import(pathToFileURL(tempPath).href + '?t=' + Date.now());
 
-    // Find the exported cards array (should be the first export that's an array)
+    // Find the exported cards array and metadata
     const cards = Object.values(module).find(value => Array.isArray(value));
+    const metadata = module.metadata;
 
     if (!cards || cards.length === 0) {
       throw new Error('No cards array found in JS file');
+    }
+
+    // Apply domain from metadata to each card (if metadata exists)
+    if (metadata && metadata.domain) {
+      cards.forEach(card => {
+        if (!card.domain) {
+          card.domain = metadata.domain;
+        }
+      });
     }
 
     // Convert to CSV
@@ -253,12 +255,19 @@ function csvToJS(inputPath, outputPath) {
   const baseName = path.basename(outputPath, '.js');
   const varName = baseName.replace(/-./g, x => x[1].toUpperCase()) + 'Cards';
 
+  // Determine domain from first card
+  const domain = cards[0]?.domain || 'General';
+
   // Generate JS content
-  const jsContent = `import { CardType, Domain, Difficulty } from '@/types'
+  const jsContent = `import { CardType, Difficulty } from '@/types'
 
 // Auto-generated from CSV
+export const metadata = {
+  domain: ${JSON.stringify(domain)}
+}
+
 export const ${varName} = [
-${cards.map(card => cardToJS(card)).join(',\n')}
+${cards.map(card => cardToJS(card, domain)).join(',\n')}
 ]
 `;
 
@@ -268,8 +277,10 @@ ${cards.map(card => cardToJS(card)).join(',\n')}
 
 /**
  * Convert card object to JS code string
+ * @param {Object} card - Card object
+ * @param {string} fileDomain - Domain from file metadata (cards shouldn't include domain)
  */
-function cardToJS(card) {
+function cardToJS(card, fileDomain) {
   const lines = [];
   lines.push('  {');
   lines.push(`    type: CardType.${card.type.toUpperCase()},`);
@@ -284,29 +295,7 @@ function cardToJS(card) {
   if (card.targets) lines.push(`    targets: ${JSON.stringify(card.targets, null, 6).replace(/\n/g, '\n    ')},`);
   if (card.items) lines.push(`    items: ${JSON.stringify(card.items, null, 6).replace(/\n/g, '\n    ')},`);
 
-  // Domain - try to match to constant
-  if (card.domain) {
-    const domainConstant = Object.keys({
-      'Threats, Attacks, and Vulnerabilities': 'THREATS',
-      'Architecture and Design': 'ARCHITECTURE',
-      'Implementation': 'IMPLEMENTATION',
-      'Operations and Incident Response': 'OPERATIONS',
-      'Governance, Risk, and Compliance': 'GOVERNANCE'
-    }).find(key => key === card.domain);
-
-    if (domainConstant) {
-      const constName = {
-        'Threats, Attacks, and Vulnerabilities': 'THREATS',
-        'Architecture and Design': 'ARCHITECTURE',
-        'Implementation': 'IMPLEMENTATION',
-        'Operations and Incident Response': 'OPERATIONS',
-        'Governance, Risk, and Compliance': 'GOVERNANCE'
-      }[domainConstant];
-      lines.push(`    domain: Domain.${constName},`);
-    } else {
-      lines.push(`    domain: ${JSON.stringify(card.domain)},`);
-    }
-  }
+  // Skip domain - it's now in metadata export
 
   if (card.topic) lines.push(`    topic: ${JSON.stringify(card.topic)},`);
   if (card.difficulty) lines.push(`    difficulty: Difficulty.${card.difficulty.toUpperCase()}`);

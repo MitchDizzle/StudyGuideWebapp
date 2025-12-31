@@ -1,9 +1,13 @@
 import { networkPlusPack } from './pack'
-import { networkingFundamentalsCards } from './networking-fundamentals'
+import { networkingFundamentalsCards, metadata as networkingFundamentalsMetadata } from './networking-fundamentals'
 
-// Export all cards combined
+// Helper to apply domain metadata to cards
+const applyDomain = (cards, metadata) =>
+  cards.map(card => ({ ...card, domain: metadata.domain }))
+
+// Export all cards combined with domain metadata applied
 export const allNetworkPlusCards = [
-  ...networkingFundamentalsCards
+  ...applyDomain(networkingFundamentalsCards, networkingFundamentalsMetadata)
   // Add more domain cards as they are created
 ]
 

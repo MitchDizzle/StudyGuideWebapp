@@ -12,7 +12,8 @@
       "Bash(for file in src/data/packs/security-plus/*.js)",
       "Bash(done)",
       "Bash(node scripts/card-converter.js:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(npm run build:*)"
     ]
   }
 }

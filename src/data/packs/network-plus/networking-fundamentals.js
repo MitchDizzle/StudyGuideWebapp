@@ -1,12 +1,15 @@
-import { CardType, Domain, Difficulty } from '@/types'
+import { CardType, Difficulty } from '@/types'
 
 // Auto-generated from CSV
+export const metadata = {
+  domain: 'Networking Fundamentals'
+}
+
 export const networkingFundamentalsCards = [
   {
     type: CardType.DEFINITION,
     front: "What is the OSI Model?",
     back: "A conceptual framework with 7 layers (Physical, Data Link, Network, Transport, Session, Presentation, Application) that standardizes network communication functions. Each layer has specific responsibilities for data transmission.",
-    domain: "Networking Fundamentals",
     topic: "OSI Model",
     difficulty: Difficulty.EASY
   },
@@ -14,7 +17,6 @@ export const networkingFundamentalsCards = [
     type: CardType.DEFINITION,
     front: "What is the difference between TCP and UDP?",
     back: "TCP (Transmission Control Protocol) is connection-oriented, reliable, with error checking and ordered delivery. UDP (User Datagram Protocol) is connectionless, faster but unreliable, with no error checking or guaranteed delivery.",
-    domain: "Networking Fundamentals",
     topic: "Transport Protocols",
     difficulty: Difficulty.MEDIUM
   },
@@ -22,7 +24,6 @@ export const networkingFundamentalsCards = [
     type: CardType.DEFINITION,
     front: "What is an IP address?",
     back: "A numerical label assigned to each device on a network. IPv4 uses 32-bit addresses (e.g., 192.168.1.1), IPv6 uses 128-bit addresses. IP addresses identify devices and enable routing between networks.",
-    domain: "Networking Fundamentals",
     topic: "IP Addressing",
     difficulty: Difficulty.EASY
   },
@@ -30,7 +31,6 @@ export const networkingFundamentalsCards = [
     type: CardType.DEFINITION,
     front: "What is a subnet mask?",
     back: "A 32-bit number that divides an IP address into network and host portions. It determines which part of an IP address identifies the network and which identifies the host. Example: 255.255.255.0 (/24).",
-    domain: "Networking Fundamentals",
     topic: "Subnetting",
     difficulty: Difficulty.MEDIUM
   },
@@ -38,7 +38,6 @@ export const networkingFundamentalsCards = [
     type: CardType.DEFINITION,
     front: "What is DHCP?",
     back: "Dynamic Host Configuration Protocol - automatically assigns IP addresses and network configuration to devices. Eliminates manual IP configuration, prevents IP conflicts, and manages address pools efficiently.",
-    domain: "Networking Fundamentals",
     topic: "Network Services",
     difficulty: Difficulty.EASY
   },
@@ -46,7 +45,6 @@ export const networkingFundamentalsCards = [
     type: CardType.DEFINITION,
     front: "What is DNS?",
     back: "Domain Name System - translates human-readable domain names (www.example.com) into IP addresses. Functions as the internet's phone book, making navigation user-friendly.",
-    domain: "Networking Fundamentals",
     topic: "Network Services",
     difficulty: Difficulty.EASY
   },
@@ -54,7 +52,6 @@ export const networkingFundamentalsCards = [
     type: CardType.DEFINITION,
     front: "What is NAT (Network Address Translation)?",
     back: "A method that maps private IP addresses to public IP addresses, allowing multiple devices on a private network to share a single public IP. Conserves IPv4 addresses and provides basic security.",
-    domain: "Networking Fundamentals",
     topic: "IP Addressing",
     difficulty: Difficulty.MEDIUM
   },
@@ -62,7 +59,6 @@ export const networkingFundamentalsCards = [
     type: CardType.DEFINITION,
     front: "What is a default gateway?",
     back: "The router IP address that devices use to communicate outside their local network. It's the 'exit point' for traffic destined for other networks or the internet.",
-    domain: "Networking Fundamentals",
     topic: "Routing",
     difficulty: Difficulty.EASY
   },
@@ -70,7 +66,6 @@ export const networkingFundamentalsCards = [
     type: CardType.DEFINITION,
     front: "What is the difference between a switch and a router?",
     back: "A switch operates at Layer 2, forwarding frames within a LAN based on MAC addresses. A router operates at Layer 3, routing packets between different networks based on IP addresses.",
-    domain: "Networking Fundamentals",
     topic: "Network Devices",
     difficulty: Difficulty.MEDIUM
   },
@@ -78,7 +73,6 @@ export const networkingFundamentalsCards = [
     type: CardType.DEFINITION,
     front: "What is ARP (Address Resolution Protocol)?",
     back: "Resolves IP addresses to MAC addresses on a local network. When a device needs to send data, ARP finds the MAC address associated with the destination IP address.",
-    domain: "Networking Fundamentals",
     topic: "Protocols",
     difficulty: Difficulty.MEDIUM
   },
@@ -86,7 +80,6 @@ export const networkingFundamentalsCards = [
     type: CardType.DEFINITION,
     front: "What is a MAC address?",
     back: "Media Access Control address - a unique 48-bit hardware identifier assigned to network interface cards. Format: XX:XX:XX:XX:XX:XX. Used for Layer 2 communication on local networks.",
-    domain: "Networking Fundamentals",
     topic: "Network Basics",
     difficulty: Difficulty.EASY
   },
@@ -94,7 +87,6 @@ export const networkingFundamentalsCards = [
     type: CardType.DEFINITION,
     front: "What is latency?",
     back: "The time delay between sending and receiving data across a network. Measured in milliseconds (ms). Factors include distance, routing, and processing time. Critical for real-time applications.",
-    domain: "Networking Fundamentals",
     topic: "Performance",
     difficulty: Difficulty.EASY
   },
@@ -102,7 +94,6 @@ export const networkingFundamentalsCards = [
     type: CardType.DEFINITION,
     front: "What is bandwidth?",
     back: "The maximum rate of data transfer across a network path, measured in bits per second (bps). Common units: Mbps (megabits), Gbps (gigabits). Represents capacity, not speed.",
-    domain: "Networking Fundamentals",
     topic: "Performance",
     difficulty: Difficulty.EASY
   },
@@ -110,7 +101,6 @@ export const networkingFundamentalsCards = [
     type: CardType.DEFINITION,
     front: "What is a VLAN?",
     back: "Virtual Local Area Network - logically segments a physical network into multiple broadcast domains. Improves security, reduces broadcast traffic, and enables flexible network management without physical changes.",
-    domain: "Networking Fundamentals",
     topic: "Switching",
     difficulty: Difficulty.MEDIUM
   },
@@ -118,7 +108,6 @@ export const networkingFundamentalsCards = [
     type: CardType.DEFINITION,
     front: "What is IPv6 and why is it important?",
     back: "The newest version of Internet Protocol using 128-bit addresses. Solves IPv4 address exhaustion, provides better security (IPSec built-in), improved routing efficiency, and eliminates need for NAT.",
-    domain: "Networking Fundamentals",
     topic: "IP Addressing",
     difficulty: Difficulty.MEDIUM
   },
@@ -126,7 +115,6 @@ export const networkingFundamentalsCards = [
     type: CardType.DEFINITION,
     front: "What is CIDR notation?",
     back: "Classless Inter-Domain Routing - a compact way to specify IP addresses and routing prefixes. Example: 192.168.1.0/24 means the first 24 bits are the network portion. Replaced classful addressing.",
-    domain: "Networking Fundamentals",
     topic: "Subnetting",
     difficulty: Difficulty.HARD
   },
@@ -134,7 +122,6 @@ export const networkingFundamentalsCards = [
     type: CardType.DEFINITION,
     front: "What are the private IP address ranges?",
     back: "Class A: 10.0.0.0/8, Class B: 172.16.0.0/12, Class C: 192.168.0.0/16. These addresses are not routable on the public internet and are used for internal networks. Defined in RFC 1918.",
-    domain: "Networking Fundamentals",
     topic: "IP Addressing",
     difficulty: Difficulty.MEDIUM
   },
@@ -142,7 +129,6 @@ export const networkingFundamentalsCards = [
     type: CardType.DEFINITION,
     front: "What is the Three-Way Handshake in TCP?",
     back: "Connection establishment process: 1) Client sends SYN, 2) Server responds with SYN-ACK, 3) Client sends ACK. This establishes a reliable connection before data transmission begins.",
-    domain: "Networking Fundamentals",
     topic: "Transport Protocols",
     difficulty: Difficulty.HARD
   },
@@ -150,7 +136,6 @@ export const networkingFundamentalsCards = [
     type: CardType.DEFINITION,
     front: "What ports do HTTP and HTTPS use?",
     back: "HTTP uses port 80 (unencrypted). HTTPS uses port 443 (encrypted with TLS/SSL). These are well-known port numbers assigned by IANA for web traffic.",
-    domain: "Networking Fundamentals",
     topic: "Protocols",
     difficulty: Difficulty.EASY
   },
@@ -158,7 +143,6 @@ export const networkingFundamentalsCards = [
     type: CardType.DEFINITION,
     front: "What is broadcast vs multicast vs unicast?",
     back: "Unicast: one-to-one communication. Broadcast: one-to-all on local network. Multicast: one-to-many (specific group). Each has different use cases and efficiency implications.",
-    domain: "Networking Fundamentals",
     topic: "Network Basics",
     difficulty: Difficulty.MEDIUM
   },
@@ -173,7 +157,6 @@ export const networkingFundamentalsCards = [
     ],
     correctAnswer: 1,
     explanation: "A switch with VLANs (Virtual Local Area Networks) can logically segment a network, separating guest WiFi traffic from internal resources while using the same physical infrastructure.",
-    domain: "Networking Fundamentals",
     topic: "Network Devices",
     difficulty: Difficulty.MEDIUM
   },
@@ -188,7 +171,6 @@ export const networkingFundamentalsCards = [
     ],
     correctAnswer: 3,
     explanation: "Cat6a (Category 6 augmented) supports 10 Gbps up to 100 meters. Cat6 only supports 10 Gbps up to 55 meters, while Cat5e maxes out at 1 Gbps.",
-    domain: "Networking Fundamentals",
     topic: "Cabling",
     difficulty: Difficulty.MEDIUM
   },
@@ -203,7 +185,6 @@ export const networkingFundamentalsCards = [
     ],
     correctAnswer: 1,
     explanation: "STP prevents broadcast storms by blocking redundant paths in the network, creating a loop-free topology while maintaining redundancy for fault tolerance.",
-    domain: "Networking Fundamentals",
     topic: "Network Protocols",
     difficulty: Difficulty.HARD
   },

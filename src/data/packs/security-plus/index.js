@@ -1,17 +1,21 @@
 import { securityPlusPack } from './pack'
-import { threatsCards } from './threats'
-import { architectureCards } from './architecture'
-import { implementationCards } from './implementation'
-import { operationsCards } from './operations'
-import { governanceCards } from './governance'
+import { threatsCards, metadata as threatsMetadata } from './threats'
+import { architectureCards, metadata as architectureMetadata } from './architecture'
+import { implementationCards, metadata as implementationMetadata } from './implementation'
+import { operationsCards, metadata as operationsMetadata } from './operations'
+import { governanceCards, metadata as governanceMetadata } from './governance'
 
-// Export all cards combined
+// Helper to apply domain metadata to cards
+const applyDomain = (cards, metadata) =>
+  cards.map(card => ({ ...card, domain: metadata.domain }))
+
+// Export all cards combined with domain metadata applied
 export const allSecurityPlusCards = [
-  ...threatsCards,
-  ...architectureCards,
-  ...implementationCards,
-  ...operationsCards,
-  ...governanceCards
+  ...applyDomain(threatsCards, threatsMetadata),
+  ...applyDomain(architectureCards, architectureMetadata),
+  ...applyDomain(implementationCards, implementationMetadata),
+  ...applyDomain(operationsCards, operationsMetadata),
+  ...applyDomain(governanceCards, governanceMetadata)
 ]
 
 // Export pack metadata
@@ -29,33 +33,33 @@ export {
 // Domain metadata for tracking
 export const domainInfo = {
   threats: {
-    name: 'Threats, Attacks, and Vulnerabilities',
+    name: threatsMetadata.domain,
     examWeight: '24%',
-    cards: threatsCards,
+    cards: applyDomain(threatsCards, threatsMetadata),
     description: 'Compare and contrast different types of social engineering, attacks, threats, and vulnerabilities'
   },
   architecture: {
-    name: 'Architecture and Design',
+    name: architectureMetadata.domain,
     examWeight: '21%',
-    cards: architectureCards,
+    cards: applyDomain(architectureCards, architectureMetadata),
     description: 'Explain the importance of security concepts in enterprise architecture'
   },
   implementation: {
-    name: 'Implementation',
+    name: implementationMetadata.domain,
     examWeight: '25%',
-    cards: implementationCards,
+    cards: applyDomain(implementationCards, implementationMetadata),
     description: 'Implement secure protocols and host/application security solutions'
   },
   operations: {
-    name: 'Operations and Incident Response',
+    name: operationsMetadata.domain,
     examWeight: '16%',
-    cards: operationsCards,
+    cards: applyDomain(operationsCards, operationsMetadata),
     description: 'Explain security operations, monitoring, and incident response procedures'
   },
   governance: {
-    name: 'Governance, Risk, and Compliance',
+    name: governanceMetadata.domain,
     examWeight: '14%',
-    cards: governanceCards,
+    cards: applyDomain(governanceCards, governanceMetadata),
     description: 'Summarize risk management and privacy/compliance concepts'
   }
 }

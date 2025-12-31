@@ -4,16 +4,6 @@ export const CardType = {
   DRAGDROP: 'dragdrop'
 }
 
-// Legacy: Kept for backwards compatibility
-// Domains are now dynamically extracted from enabled packs
-export const Domain = {
-  THREATS: 'Threats, Attacks, and Vulnerabilities',
-  ARCHITECTURE: 'Architecture and Design',
-  IMPLEMENTATION: 'Implementation',
-  OPERATIONS: 'Operations and Incident Response',
-  GOVERNANCE: 'Governance, Risk, and Compliance'
-}
-
 export const Difficulty = {
   EASY: 'easy',
   MEDIUM: 'medium',

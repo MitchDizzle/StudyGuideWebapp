@@ -1,13 +1,15 @@
-import { CardType, Domain, Difficulty } from '@/types'
+import { CardType, Difficulty } from '@/types'
 
 // Domain 4: Operations and Incident Response (16% of exam)
+export const metadata = {
+  domain: 'Operations and Incident Response'}
+
 export const operationsCards = [
   // Definition Cards
   {
     type: CardType.DEFINITION,
     front: 'What is Chain of Custody?',
     back: 'The chronological documentation of the seizure, custody, control, transfer, analysis, and disposition of evidence. It ensures evidence integrity for legal proceedings.',
-    domain: Domain.OPERATIONS,
     topic: 'Digital Forensics',
     difficulty: Difficulty.MEDIUM
   },
@@ -15,7 +17,6 @@ export const operationsCards = [
     type: CardType.DEFINITION,
     front: 'What is the purpose of a Security Information and Event Management (SIEM) system?',
     back: 'A SIEM aggregates and analyzes security logs and events from multiple sources in real-time, providing centralized monitoring, alerting, and forensic analysis capabilities.',
-    domain: Domain.OPERATIONS,
     topic: 'Security Tools',
     difficulty: Difficulty.MEDIUM
   },
@@ -23,7 +24,6 @@ export const operationsCards = [
     type: CardType.DEFINITION,
     front: 'What is a Honeypot?',
     back: 'A decoy system designed to attract attackers, allowing security teams to study attack methods and divert attackers from real systems.',
-    domain: Domain.OPERATIONS,
     topic: 'Security Tools',
     difficulty: Difficulty.MEDIUM
   },
@@ -31,7 +31,6 @@ export const operationsCards = [
     type: CardType.DEFINITION,
     front: 'What are the phases of the Incident Response lifecycle?',
     back: 'Preparation, Identification, Containment, Eradication, Recovery, and Lessons Learned. This systematic approach ensures effective handling of security incidents.',
-    domain: Domain.OPERATIONS,
     topic: 'Incident Response',
     difficulty: Difficulty.MEDIUM
   },
@@ -48,7 +47,6 @@ export const operationsCards = [
     ],
     correctAnswer: 1,
     explanation: 'Containment by isolating the server prevents further damage while preserving evidence in memory. Powering off loses volatile memory data. The priority is to contain while preserving evidence for investigation.',
-    domain: Domain.OPERATIONS,
     topic: 'Incident Response',
     difficulty: Difficulty.HARD
   },
@@ -57,7 +55,6 @@ export const operationsCards = [
     type: CardType.DEFINITION,
     front: 'What is the Order of Volatility in digital forensics?',
     back: 'The sequence for collecting digital evidence from most to least volatile: CPU registers/cache → RAM → Network traffic → Disk drives → Backups/archives. Collect volatile data first as it\'s lost when power is removed.',
-    domain: Domain.OPERATIONS,
     topic: 'Digital Forensics',
     difficulty: Difficulty.HARD
   },
@@ -65,7 +62,6 @@ export const operationsCards = [
     type: CardType.DEFINITION,
     front: 'What is a write blocker in forensics?',
     back: 'A hardware or software tool that allows read-only access to storage media, preventing any writes that could alter evidence. Essential for maintaining evidence integrity.',
-    domain: Domain.OPERATIONS,
     topic: 'Digital Forensics',
     difficulty: Difficulty.MEDIUM
   },
@@ -73,7 +69,6 @@ export const operationsCards = [
     type: CardType.DEFINITION,
     front: 'What is the difference between containment, eradication, and recovery?',
     back: 'Containment limits damage and isolates the threat. Eradication removes the threat and vulnerabilities. Recovery restores systems to normal operations. They are sequential phases in incident response.',
-    domain: Domain.OPERATIONS,
     topic: 'Incident Response',
     difficulty: Difficulty.MEDIUM
   },
@@ -81,7 +76,6 @@ export const operationsCards = [
     type: CardType.DEFINITION,
     front: 'What is vulnerability scanning vs penetration testing?',
     back: 'Vulnerability scanning automatically identifies known vulnerabilities (passive). Penetration testing actively exploits vulnerabilities to assess real-world risk (aggressive). Pen tests are deeper but require authorization.',
-    domain: Domain.OPERATIONS,
     topic: 'Vulnerability Management',
     difficulty: Difficulty.MEDIUM
   },
@@ -89,7 +83,6 @@ export const operationsCards = [
     type: CardType.DEFINITION,
     front: 'What is patch management?',
     back: 'The process of identifying, acquiring, testing, and installing patches/updates to systems. Includes patch prioritization, scheduling, deployment, and verification.',
-    domain: Domain.OPERATIONS,
     topic: 'Patch Management',
     difficulty: Difficulty.EASY
   },
@@ -97,7 +90,6 @@ export const operationsCards = [
     type: CardType.DEFINITION,
     front: 'What is the 3-2-1 backup rule?',
     back: '3 copies of data, on 2 different media types, with 1 copy offsite. This ensures backup resilience against various failure scenarios.',
-    domain: Domain.OPERATIONS,
     topic: 'Backups',
     difficulty: Difficulty.EASY
   },
@@ -105,7 +97,6 @@ export const operationsCards = [
     type: CardType.DEFINITION,
     front: 'What is the difference between full, incremental, and differential backups?',
     back: 'Full backs up everything. Incremental backs up changes since last backup (any type). Differential backs up changes since last FULL backup. Incremental is fastest but slowest to restore.',
-    domain: Domain.OPERATIONS,
     topic: 'Backups',
     difficulty: Difficulty.MEDIUM
   },
@@ -113,7 +104,6 @@ export const operationsCards = [
     type: CardType.DEFINITION,
     front: 'What is a SOC (Security Operations Center)?',
     back: 'A centralized unit that monitors, detects, analyzes, and responds to cybersecurity incidents. Operates 24/7 using SIEM, threat intelligence, and incident response procedures.',
-    domain: Domain.OPERATIONS,
     topic: 'Security Operations',
     difficulty: Difficulty.EASY
   },
@@ -121,7 +111,6 @@ export const operationsCards = [
     type: CardType.DEFINITION,
     front: 'What is threat hunting?',
     back: 'Proactive searching for cyber threats that evade existing security solutions. Uses hypothesis-driven investigation, behavioral analysis, and threat intelligence to find hidden threats.',
-    domain: Domain.OPERATIONS,
     topic: 'Security Operations',
     difficulty: Difficulty.MEDIUM
   },
@@ -129,7 +118,6 @@ export const operationsCards = [
     type: CardType.DEFINITION,
     front: 'What is log aggregation and why is it important?',
     back: 'Collecting logs from multiple sources into a central location for analysis. Critical for detecting distributed attacks, meeting compliance requirements, and performing forensic investigations.',
-    domain: Domain.OPERATIONS,
     topic: 'Logging and Monitoring',
     difficulty: Difficulty.EASY
   },
@@ -144,7 +132,6 @@ export const operationsCards = [
     ],
     correctAnswer: 2,
     explanation: 'With incremental backups, you need the last full backup plus ALL incremental backups since then. Each incremental only contains changes since the previous backup of any type.',
-    domain: Domain.OPERATIONS,
     topic: 'Backups',
     difficulty: Difficulty.HARD
   },
@@ -159,7 +146,6 @@ export const operationsCards = [
     ],
     correctAnswer: 1,
     explanation: 'During active exfiltration, containment is the priority to stop ongoing damage. Isolate affected systems from the network immediately, then proceed with documentation and investigation.',
-    domain: Domain.OPERATIONS,
     topic: 'Incident Response',
     difficulty: Difficulty.MEDIUM
   },
@@ -174,7 +160,6 @@ export const operationsCards = [
     ],
     correctAnswer: 2,
     explanation: 'Always verify critical findings first. Scanners can produce false positives. Once confirmed, then prioritize remediation based on risk. Taking systems offline without verification can cause unnecessary business disruption.',
-    domain: Domain.OPERATIONS,
     topic: 'Vulnerability Management',
     difficulty: Difficulty.MEDIUM
   },
@@ -182,7 +167,6 @@ export const operationsCards = [
     type: CardType.DEFINITION,
     front: 'What is SOAR (Security Orchestration, Automation, and Response)?',
     back: 'Technologies that enable organizations to collect security data, define incident analysis and response procedures, and execute them automatically. Reduces response time and analyst workload.',
-    domain: Domain.OPERATIONS,
     topic: 'Security Automation',
     difficulty: Difficulty.MEDIUM
   },
@@ -208,7 +192,6 @@ export const operationsCards = [
       'Lessons Learned'
     ],
     explanation: 'The NIST Incident Response lifecycle: Preparation → Identification → Containment → Eradication → Recovery → Lessons Learned. This systematic approach ensures effective incident handling.',
-    domain: Domain.OPERATIONS,
     topic: 'Incident Response',
     difficulty: Difficulty.HARD
   },
@@ -230,7 +213,6 @@ export const operationsCards = [
       'Backup tapes and archives'
     ],
     explanation: 'Order of volatility determines evidence collection priority. Volatile data is lost when power is removed or time passes. Collect it first to preserve critical evidence.',
-    domain: Domain.OPERATIONS,
     topic: 'Digital Forensics',
     difficulty: Difficulty.HARD
   }
