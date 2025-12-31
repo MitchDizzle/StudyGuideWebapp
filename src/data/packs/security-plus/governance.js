@@ -53,6 +53,133 @@ export const governanceCards = [
     difficulty: Difficulty.HARD
   },
 
+  {
+    type: CardType.DEFINITION,
+    front: 'What is RTO (Recovery Time Objective)?',
+    back: 'The maximum acceptable amount of time that a system can be down after a failure or disaster. It defines how quickly you need to restore operations.',
+    domain: Domain.GOVERNANCE,
+    topic: 'Business Continuity',
+    difficulty: Difficulty.MEDIUM
+  },
+  {
+    type: CardType.DEFINITION,
+    front: 'What is RPO (Recovery Point Objective)?',
+    back: 'The maximum acceptable amount of data loss measured in time. It defines how far back your backups need to go to avoid unacceptable data loss.',
+    domain: Domain.GOVERNANCE,
+    topic: 'Business Continuity',
+    difficulty: Difficulty.MEDIUM
+  },
+  {
+    type: CardType.DEFINITION,
+    front: 'What is a BIA (Business Impact Analysis)?',
+    back: 'A systematic process to identify and evaluate the potential effects of disruptions to critical business operations. It determines RTOs, RPOs, and critical business functions.',
+    domain: Domain.GOVERNANCE,
+    topic: 'Business Continuity',
+    difficulty: Difficulty.MEDIUM
+  },
+  {
+    type: CardType.DEFINITION,
+    front: 'What are the four levels of data classification (from most to least sensitive)?',
+    back: 'Top Secret/Highly Confidential, Secret/Confidential, Internal/Private, Public/Unclassified. Classification drives handling, storage, and access requirements.',
+    domain: Domain.GOVERNANCE,
+    topic: 'Data Classification',
+    difficulty: Difficulty.EASY
+  },
+  {
+    type: CardType.DEFINITION,
+    front: 'What is MTTR (Mean Time To Repair)?',
+    back: 'The average time required to repair a failed component or system and return it to operational status. Lower MTTR means faster recovery.',
+    domain: Domain.GOVERNANCE,
+    topic: 'Business Continuity',
+    difficulty: Difficulty.EASY
+  },
+  {
+    type: CardType.DEFINITION,
+    front: 'What is MTBF (Mean Time Between Failures)?',
+    back: 'The predicted elapsed time between inherent failures of a system during normal operation. Higher MTBF indicates more reliable systems.',
+    domain: Domain.GOVERNANCE,
+    topic: 'Business Continuity',
+    difficulty: Difficulty.EASY
+  },
+  {
+    type: CardType.DEFINITION,
+    front: 'What is PII (Personally Identifiable Information)?',
+    back: 'Information that can be used to identify, contact, or locate a specific individual. Examples: SSN, driver\'s license, email address, biometric data. Requires special protection.',
+    domain: Domain.GOVERNANCE,
+    topic: 'Privacy',
+    difficulty: Difficulty.EASY
+  },
+  {
+    type: CardType.DEFINITION,
+    front: 'What is PHI (Protected Health Information)?',
+    back: 'Any individually identifiable health information held by covered entities under HIPAA. Includes medical records, billing information, and any health data linked to an individual.',
+    domain: Domain.GOVERNANCE,
+    topic: 'Privacy',
+    difficulty: Difficulty.EASY
+  },
+  {
+    type: CardType.DEFINITION,
+    front: 'What is Change Management?',
+    back: 'A formal process to ensure changes to IT systems are implemented in a controlled manner. Includes request, approval, testing, implementation, and documentation phases.',
+    domain: Domain.GOVERNANCE,
+    topic: 'Change Management',
+    difficulty: Difficulty.EASY
+  },
+  {
+    type: CardType.SCENARIO,
+    scenario: 'Your organization wants to outsource email services to a cloud provider. What should be your primary security concern?',
+    options: [
+      'The cost of the service',
+      'Data sovereignty and jurisdiction',
+      'The provider\'s marketing materials',
+      'The color scheme of the interface'
+    ],
+    correctAnswer: 1,
+    explanation: 'Data sovereignty (where data is stored and which laws apply) is critical when outsourcing. Different countries have different privacy laws, and you need to ensure compliance with regulations like GDPR.',
+    domain: Domain.GOVERNANCE,
+    topic: 'Third-Party Risk',
+    difficulty: Difficulty.MEDIUM
+  },
+  {
+    type: CardType.SCENARIO,
+    scenario: 'During a risk assessment, you identify a threat with a 0.1 ARO and a $50,000 SLE. What is the ALE?',
+    options: [
+      '$500',
+      '$5,000',
+      '$50,000',
+      '$500,000'
+    ],
+    correctAnswer: 1,
+    explanation: 'ALE (Annual Loss Expectancy) = SLE × ARO = $50,000 × 0.1 = $5,000. This is the expected annual cost of this particular risk.',
+    domain: Domain.GOVERNANCE,
+    topic: 'Risk Management',
+    difficulty: Difficulty.HARD
+  },
+  {
+    type: CardType.DEFINITION,
+    front: 'What is the principle of least privilege?',
+    back: 'Users should be granted the minimum levels of access - or permissions - needed to perform their job functions. This limits damage from accidents or malicious actions.',
+    domain: Domain.GOVERNANCE,
+    topic: 'Security Policies',
+    difficulty: Difficulty.EASY
+  },
+  {
+    type: CardType.DEFINITION,
+    front: 'What is separation of duties?',
+    back: 'A security principle where critical tasks are divided among multiple people to prevent fraud and error. No single person should have complete control over a critical function.',
+    domain: Domain.GOVERNANCE,
+    topic: 'Security Policies',
+    difficulty: Difficulty.MEDIUM
+  },
+  {
+    type: CardType.DEFINITION,
+    front: 'What is mandatory vacation policy?',
+    back: 'A security control requiring employees to take consecutive days off, during which someone else performs their duties. Helps detect fraud or unauthorized activities.',
+    domain: Domain.GOVERNANCE,
+    topic: 'Security Policies',
+    difficulty: Difficulty.MEDIUM
+  },
+
   // Drag and Drop Cards
   {
     type: CardType.DRAGDROP,
@@ -72,6 +199,26 @@ export const governanceCards = [
     explanation: 'Different compliance frameworks target different industries and data types. HIPAA=healthcare, PCI DSS=payment cards, SOX=financial reporting, GDPR=EU personal data.',
     domain: Domain.GOVERNANCE,
     topic: 'Compliance',
+    difficulty: Difficulty.MEDIUM
+  },
+  {
+    type: CardType.DRAGDROP,
+    instructions: 'Match each risk response strategy to its description:',
+    targets: [
+      { label: 'Risk Avoidance', correctItem: 'Eliminate the risk entirely by not engaging in the activity' },
+      { label: 'Risk Mitigation', correctItem: 'Reduce the likelihood or impact of the risk' },
+      { label: 'Risk Transfer', correctItem: 'Shift the risk to a third party (insurance, outsourcing)' },
+      { label: 'Risk Acceptance', correctItem: 'Accept the risk when cost of mitigation exceeds the benefit' }
+    ],
+    items: [
+      'Eliminate the risk entirely by not engaging in the activity',
+      'Reduce the likelihood or impact of the risk',
+      'Shift the risk to a third party (insurance, outsourcing)',
+      'Accept the risk when cost of mitigation exceeds the benefit'
+    ],
+    explanation: 'The four risk response strategies provide different approaches to managing identified risks based on business priorities and cost-benefit analysis.',
+    domain: Domain.GOVERNANCE,
+    topic: 'Risk Management',
     difficulty: Difficulty.MEDIUM
   }
 ]

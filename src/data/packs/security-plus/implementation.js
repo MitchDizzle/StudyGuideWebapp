@@ -76,6 +76,117 @@ export const implementationCards = [
     difficulty: Difficulty.MEDIUM
   },
 
+  {
+    type: CardType.DEFINITION,
+    front: 'What is the difference between HTTPS and HTTP?',
+    back: 'HTTPS (HTTP Secure) encrypts data in transit using TLS/SSL, protecting confidentiality and integrity. HTTP transmits data in plaintext. HTTPS uses port 443, HTTP uses port 80.',
+    domain: Domain.IMPLEMENTATION,
+    topic: 'Secure Protocols',
+    difficulty: Difficulty.EASY
+  },
+  {
+    type: CardType.DEFINITION,
+    front: 'What is WPA3 and how does it improve on WPA2?',
+    back: 'WPA3 is the latest WiFi security standard. Improvements over WPA2 include: stronger encryption (192-bit), protection against brute-force attacks, individualized data encryption (SAE), and forward secrecy.',
+    domain: Domain.IMPLEMENTATION,
+    topic: 'Wireless Security',
+    difficulty: Difficulty.MEDIUM
+  },
+  {
+    type: CardType.DEFINITION,
+    front: 'What is 802.1X?',
+    back: 'A network access control protocol that provides authentication for devices trying to connect to a LAN or WLAN. Uses EAP (Extensible Authentication Protocol) and RADIUS for centralized authentication.',
+    domain: Domain.IMPLEMENTATION,
+    topic: 'Network Security',
+    difficulty: Difficulty.HARD
+  },
+  {
+    type: CardType.DEFINITION,
+    front: 'What is a VPN and what are the two main types?',
+    back: 'Virtual Private Network creates encrypted tunnels over public networks. Site-to-site VPN connects entire networks. Remote access VPN connects individual users to a network. Common protocols: IPSec, SSL/TLS.',
+    domain: Domain.IMPLEMENTATION,
+    topic: 'Network Security',
+    difficulty: Difficulty.MEDIUM
+  },
+  {
+    type: CardType.DEFINITION,
+    front: 'What is SSO (Single Sign-On)?',
+    back: 'Authentication scheme allowing users to log in once and access multiple applications without re-authenticating. Improves user experience and security, but creates a single point of failure. Examples: SAML, OAuth.',
+    domain: Domain.IMPLEMENTATION,
+    topic: 'IAM',
+    difficulty: Difficulty.MEDIUM
+  },
+  {
+    type: CardType.DEFINITION,
+    front: 'What is the difference between IDS and IPS?',
+    back: 'IDS (Intrusion Detection System) monitors and alerts on suspicious activity. IPS (Intrusion Prevention System) can actively block/prevent threats. IPS is inline with traffic, IDS passively monitors.',
+    domain: Domain.IMPLEMENTATION,
+    topic: 'Security Tools',
+    difficulty: Difficulty.EASY
+  },
+  {
+    type: CardType.DEFINITION,
+    front: 'What are SPF, DKIM, and DMARC?',
+    back: 'Email authentication protocols. SPF specifies authorized mail servers. DKIM adds digital signatures to verify sender. DMARC ties them together and defines policy for handling failures. All combat email spoofing.',
+    domain: Domain.IMPLEMENTATION,
+    topic: 'Email Security',
+    difficulty: Difficulty.HARD
+  },
+  {
+    type: CardType.DEFINITION,
+    front: 'What is a DMZ (Demilitarized Zone)?',
+    back: 'A network segment that sits between the internal trusted network and untrusted external networks. Hosts public-facing services (web, email servers) with restricted access to internal resources.',
+    domain: Domain.IMPLEMENTATION,
+    topic: 'Network Security',
+    difficulty: Difficulty.MEDIUM
+  },
+  {
+    type: CardType.DEFINITION,
+    front: 'What is MDM (Mobile Device Management)?',
+    back: 'Software that manages, monitors, and secures mobile devices. Features include remote wipe, app management, encryption enforcement, and policy compliance. Critical for BYOD environments.',
+    domain: Domain.IMPLEMENTATION,
+    topic: 'Mobile Security',
+    difficulty: Difficulty.EASY
+  },
+  {
+    type: CardType.SCENARIO,
+    scenario: 'Your company needs to allow employees to access internal resources from personal devices (BYOD). What security measures should you implement?',
+    options: [
+      'Allow direct access with just a password',
+      'VPN with MFA, MDM, and network segmentation',
+      'Ban all personal devices completely',
+      'Only allow access during business hours'
+    ],
+    correctAnswer: 1,
+    explanation: 'BYOD requires layered security: VPN encrypts traffic, MFA verifies users, MDM manages device security, and network segmentation limits access to only necessary resources. This balances security with business needs.',
+    domain: Domain.IMPLEMENTATION,
+    topic: 'Mobile Security',
+    difficulty: Difficulty.MEDIUM
+  },
+  {
+    type: CardType.SCENARIO,
+    scenario: 'You need to protect web servers from attackers while allowing legitimate traffic. What should you deploy?',
+    options: [
+      'Antivirus software',
+      'Web Application Firewall (WAF)',
+      'Standard network firewall only',
+      'IDS in passive mode'
+    ],
+    correctAnswer: 1,
+    explanation: 'WAF specifically protects web applications by filtering and monitoring HTTP/HTTPS traffic. It defends against attacks like SQL injection, XSS, and CSRF. Standard firewalls work at network layer; WAF works at application layer.',
+    domain: Domain.IMPLEMENTATION,
+    topic: 'Security Tools',
+    difficulty: Difficulty.MEDIUM
+  },
+  {
+    type: CardType.DEFINITION,
+    front: 'What is perfect forward secrecy (PFS)?',
+    back: 'A cryptographic property ensuring session keys are not compromised even if the server\'s private key is compromised. Each session generates unique encryption keys that are discarded after use.',
+    domain: Domain.IMPLEMENTATION,
+    topic: 'Cryptography',
+    difficulty: Difficulty.HARD
+  },
+
   // Drag and Drop Cards
   {
     type: CardType.DRAGDROP,
@@ -95,6 +206,26 @@ export const implementationCards = [
     explanation: 'Authentication factors fall into categories. Knowledge factors (passwords), possession factors (tokens), inherence factors (biometrics), and location factors (geolocation) can be combined for multi-factor authentication.',
     domain: Domain.IMPLEMENTATION,
     topic: 'IAM',
+    difficulty: Difficulty.MEDIUM
+  },
+  {
+    type: CardType.DRAGDROP,
+    instructions: 'Match each wireless security protocol to its key feature:',
+    targets: [
+      { label: 'WEP', correctItem: 'Outdated, easily cracked, uses RC4' },
+      { label: 'WPA', correctItem: 'TKIP encryption, temporary solution' },
+      { label: 'WPA2', correctItem: 'AES encryption, enterprise standard' },
+      { label: 'WPA3', correctItem: 'SAE authentication, strongest current standard' }
+    ],
+    items: [
+      'Outdated, easily cracked, uses RC4',
+      'TKIP encryption, temporary solution',
+      'AES encryption, enterprise standard',
+      'SAE authentication, strongest current standard'
+    ],
+    explanation: 'Wireless security has evolved: WEP (deprecated), WPA (transitional), WPA2 (current standard with AES), WPA3 (latest with SAE and enhanced protection). Always use WPA2 or WPA3.',
+    domain: Domain.IMPLEMENTATION,
+    topic: 'Wireless Security',
     difficulty: Difficulty.MEDIUM
   }
 ]

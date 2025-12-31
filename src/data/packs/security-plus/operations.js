@@ -53,6 +53,140 @@ export const operationsCards = [
     difficulty: Difficulty.HARD
   },
 
+  {
+    type: CardType.DEFINITION,
+    front: 'What is the Order of Volatility in digital forensics?',
+    back: 'The sequence for collecting digital evidence from most to least volatile: CPU registers/cache → RAM → Network traffic → Disk drives → Backups/archives. Collect volatile data first as it\'s lost when power is removed.',
+    domain: Domain.OPERATIONS,
+    topic: 'Digital Forensics',
+    difficulty: Difficulty.HARD
+  },
+  {
+    type: CardType.DEFINITION,
+    front: 'What is a write blocker in forensics?',
+    back: 'A hardware or software tool that allows read-only access to storage media, preventing any writes that could alter evidence. Essential for maintaining evidence integrity.',
+    domain: Domain.OPERATIONS,
+    topic: 'Digital Forensics',
+    difficulty: Difficulty.MEDIUM
+  },
+  {
+    type: CardType.DEFINITION,
+    front: 'What is the difference between containment, eradication, and recovery?',
+    back: 'Containment limits damage and isolates the threat. Eradication removes the threat and vulnerabilities. Recovery restores systems to normal operations. They are sequential phases in incident response.',
+    domain: Domain.OPERATIONS,
+    topic: 'Incident Response',
+    difficulty: Difficulty.MEDIUM
+  },
+  {
+    type: CardType.DEFINITION,
+    front: 'What is vulnerability scanning vs penetration testing?',
+    back: 'Vulnerability scanning automatically identifies known vulnerabilities (passive). Penetration testing actively exploits vulnerabilities to assess real-world risk (aggressive). Pen tests are deeper but require authorization.',
+    domain: Domain.OPERATIONS,
+    topic: 'Vulnerability Management',
+    difficulty: Difficulty.MEDIUM
+  },
+  {
+    type: CardType.DEFINITION,
+    front: 'What is patch management?',
+    back: 'The process of identifying, acquiring, testing, and installing patches/updates to systems. Includes patch prioritization, scheduling, deployment, and verification.',
+    domain: Domain.OPERATIONS,
+    topic: 'Patch Management',
+    difficulty: Difficulty.EASY
+  },
+  {
+    type: CardType.DEFINITION,
+    front: 'What is the 3-2-1 backup rule?',
+    back: '3 copies of data, on 2 different media types, with 1 copy offsite. This ensures backup resilience against various failure scenarios.',
+    domain: Domain.OPERATIONS,
+    topic: 'Backups',
+    difficulty: Difficulty.EASY
+  },
+  {
+    type: CardType.DEFINITION,
+    front: 'What is the difference between full, incremental, and differential backups?',
+    back: 'Full backs up everything. Incremental backs up changes since last backup (any type). Differential backs up changes since last FULL backup. Incremental is fastest but slowest to restore.',
+    domain: Domain.OPERATIONS,
+    topic: 'Backups',
+    difficulty: Difficulty.MEDIUM
+  },
+  {
+    type: CardType.DEFINITION,
+    front: 'What is a SOC (Security Operations Center)?',
+    back: 'A centralized unit that monitors, detects, analyzes, and responds to cybersecurity incidents. Operates 24/7 using SIEM, threat intelligence, and incident response procedures.',
+    domain: Domain.OPERATIONS,
+    topic: 'Security Operations',
+    difficulty: Difficulty.EASY
+  },
+  {
+    type: CardType.DEFINITION,
+    front: 'What is threat hunting?',
+    back: 'Proactive searching for cyber threats that evade existing security solutions. Uses hypothesis-driven investigation, behavioral analysis, and threat intelligence to find hidden threats.',
+    domain: Domain.OPERATIONS,
+    topic: 'Security Operations',
+    difficulty: Difficulty.MEDIUM
+  },
+  {
+    type: CardType.DEFINITION,
+    front: 'What is log aggregation and why is it important?',
+    back: 'Collecting logs from multiple sources into a central location for analysis. Critical for detecting distributed attacks, meeting compliance requirements, and performing forensic investigations.',
+    domain: Domain.OPERATIONS,
+    topic: 'Logging and Monitoring',
+    difficulty: Difficulty.EASY
+  },
+  {
+    type: CardType.SCENARIO,
+    scenario: 'Your backup system performs full backups on Sunday and incremental backups Monday through Saturday. On Thursday, a ransomware attack encrypts your data. What backups do you need to restore?',
+    options: [
+      'Only Thursday\'s incremental backup',
+      'Sunday\'s full backup only',
+      'Sunday\'s full + Monday, Tuesday, Wednesday, Thursday incrementals',
+      'Sunday\'s full + Wednesday\'s incremental'
+    ],
+    correctAnswer: 2,
+    explanation: 'With incremental backups, you need the last full backup plus ALL incremental backups since then. Each incremental only contains changes since the previous backup of any type.',
+    domain: Domain.OPERATIONS,
+    topic: 'Backups',
+    difficulty: Difficulty.HARD
+  },
+  {
+    type: CardType.SCENARIO,
+    scenario: 'You detect an ongoing data exfiltration from your network. What is the first step?',
+    options: [
+      'Document everything for evidence',
+      'Isolate the affected systems to stop the leak',
+      'Notify law enforcement immediately',
+      'Perform a full system restore from backup'
+    ],
+    correctAnswer: 1,
+    explanation: 'During active exfiltration, containment is the priority to stop ongoing damage. Isolate affected systems from the network immediately, then proceed with documentation and investigation.',
+    domain: Domain.OPERATIONS,
+    topic: 'Incident Response',
+    difficulty: Difficulty.MEDIUM
+  },
+  {
+    type: CardType.SCENARIO,
+    scenario: 'A vulnerability scan reports a critical SQL injection vulnerability in a public-facing web application. What should be your first action?',
+    options: [
+      'Immediately take the application offline',
+      'Schedule patching for next maintenance window',
+      'Verify the vulnerability is real (not a false positive)',
+      'Ignore it if the application isn\'t storing sensitive data'
+    ],
+    correctAnswer: 2,
+    explanation: 'Always verify critical findings first. Scanners can produce false positives. Once confirmed, then prioritize remediation based on risk. Taking systems offline without verification can cause unnecessary business disruption.',
+    domain: Domain.OPERATIONS,
+    topic: 'Vulnerability Management',
+    difficulty: Difficulty.MEDIUM
+  },
+  {
+    type: CardType.DEFINITION,
+    front: 'What is SOAR (Security Orchestration, Automation, and Response)?',
+    back: 'Technologies that enable organizations to collect security data, define incident analysis and response procedures, and execute them automatically. Reduces response time and analyst workload.',
+    domain: Domain.OPERATIONS,
+    topic: 'Security Automation',
+    difficulty: Difficulty.MEDIUM
+  },
+
   // Drag and Drop Cards
   {
     type: CardType.DRAGDROP,
@@ -76,6 +210,28 @@ export const operationsCards = [
     explanation: 'The NIST Incident Response lifecycle: Preparation → Identification → Containment → Eradication → Recovery → Lessons Learned. This systematic approach ensures effective incident handling.',
     domain: Domain.OPERATIONS,
     topic: 'Incident Response',
+    difficulty: Difficulty.HARD
+  },
+  {
+    type: CardType.DRAGDROP,
+    instructions: 'Order the following by volatility (most volatile first):',
+    targets: [
+      { label: 'Most Volatile', correctItem: 'CPU registers and cache' },
+      { label: '2nd', correctItem: 'RAM (Random Access Memory)' },
+      { label: '3rd', correctItem: 'Network traffic and connections' },
+      { label: '4th', correctItem: 'Hard disk drives' },
+      { label: 'Least Volatile', correctItem: 'Backup tapes and archives' }
+    ],
+    items: [
+      'CPU registers and cache',
+      'RAM (Random Access Memory)',
+      'Network traffic and connections',
+      'Hard disk drives',
+      'Backup tapes and archives'
+    ],
+    explanation: 'Order of volatility determines evidence collection priority. Volatile data is lost when power is removed or time passes. Collect it first to preserve critical evidence.',
+    domain: Domain.OPERATIONS,
+    topic: 'Digital Forensics',
     difficulty: Difficulty.HARD
   }
 ]

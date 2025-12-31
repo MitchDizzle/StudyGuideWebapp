@@ -8,7 +8,9 @@
       "Bash(npm ci:*)",
       "Bash(curl:*)",
       "Bash(tasklist:*)",
-      "Bash(netstat:*)"
+      "Bash(netstat:*)",
+      "Bash(for file in src/data/packs/security-plus/*.js)",
+      "Bash(done)"
     ]
   }
 }

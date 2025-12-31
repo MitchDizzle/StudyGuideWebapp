@@ -153,6 +153,93 @@ export const threatsCards = [
     difficulty: Difficulty.MEDIUM
   },
   {
+    type: CardType.DEFINITION,
+    front: 'What is Cross-Site Scripting (XSS)?',
+    back: 'An injection attack where malicious scripts are injected into trusted websites. The attacker\'s script executes in victim\'s browser, potentially stealing cookies, session tokens, or sensitive data. Three types: Stored, Reflected, and DOM-based.',
+    domain: Domain.THREATS,
+    topic: 'Application Attacks',
+    difficulty: Difficulty.MEDIUM
+  },
+  {
+    type: CardType.DEFINITION,
+    front: 'What is CSRF (Cross-Site Request Forgery)?',
+    back: 'An attack that tricks a victim into executing unwanted actions on a web application where they\'re authenticated. The attacker forges requests using the victim\'s credentials. Mitigated with CSRF tokens.',
+    domain: Domain.THREATS,
+    topic: 'Application Attacks',
+    difficulty: Difficulty.HARD
+  },
+  {
+    type: CardType.DEFINITION,
+    front: 'What is a buffer overflow attack?',
+    back: 'An attack that exploits programs that don\'t properly validate input size, writing data beyond allocated memory. Can crash programs or execute arbitrary code. Prevented with input validation and modern memory protections.',
+    domain: Domain.THREATS,
+    topic: 'Application Attacks',
+    difficulty: Difficulty.HARD
+  },
+  {
+    type: CardType.DEFINITION,
+    front: 'What is ARP spoofing/poisoning?',
+    back: 'An attack where false ARP messages are sent to associate the attacker\'s MAC address with an IP address (often the gateway), allowing the attacker to intercept, modify, or stop traffic. A man-in-the-middle technique.',
+    domain: Domain.THREATS,
+    topic: 'Network Attacks',
+    difficulty: Difficulty.MEDIUM
+  },
+  {
+    type: CardType.DEFINITION,
+    front: 'What is DNS poisoning?',
+    back: 'An attack that corrupts DNS cache data, redirecting domain names to malicious IP addresses. Victims think they\'re visiting legitimate sites but are sent to attacker-controlled servers. Also called DNS cache poisoning.',
+    domain: Domain.THREATS,
+    topic: 'Network Attacks',
+    difficulty: Difficulty.MEDIUM
+  },
+  {
+    type: CardType.DEFINITION,
+    front: 'What is pretexting?',
+    back: 'A social engineering tactic where the attacker creates a fabricated scenario (pretext) to trick victims into divulging information or performing actions. Often involves impersonating authority figures or trusted entities.',
+    domain: Domain.THREATS,
+    topic: 'Social Engineering',
+    difficulty: Difficulty.MEDIUM
+  },
+  {
+    type: CardType.DEFINITION,
+    front: 'What is tailgating/piggybacking?',
+    back: 'A physical security breach where unauthorized persons follow authorized personnel through secure doors. Tailgating is without knowledge; piggybacking is with consent. Prevented with mantraps and security awareness.',
+    domain: Domain.THREATS,
+    topic: 'Physical Security',
+    difficulty: Difficulty.EASY
+  },
+  {
+    type: CardType.DEFINITION,
+    front: 'What is a supply chain attack?',
+    back: 'An attack that targets less-secure elements in the supply chain to compromise the final target. Examples: compromised software updates, malicious hardware components, infected third-party libraries. SolarWinds is a famous example.',
+    domain: Domain.THREATS,
+    topic: 'Advanced Threats',
+    difficulty: Difficulty.HARD
+  },
+  {
+    type: CardType.DEFINITION,
+    front: 'What is a rainbow table attack?',
+    back: 'A password cracking technique using pre computed tables of hash values for common passwords. Much faster than brute force. Defeated by salting (adding random data before hashing).',
+    domain: Domain.THREATS,
+    topic: 'Cryptographic Attacks',
+    difficulty: Difficulty.MEDIUM
+  },
+  {
+    type: CardType.SCENARIO,
+    scenario: 'An attacker sends emails to employees impersonating the CEO, requesting urgent wire transfers. What type of attack is this?',
+    options: [
+      'Phishing',
+      'Whaling',
+      'Vishing',
+      'Pharming'
+    ],
+    correctAnswer: 1,
+    explanation: 'This is whaling - a targeted phishing attack aimed at high-value targets (executives). The attacker impersonates authority (CEO) to trick employees into unauthorized actions. Common in BEC (Business Email Compromise) scams.',
+    domain: Domain.THREATS,
+    topic: 'Social Engineering',
+    difficulty: Difficulty.MEDIUM
+  },
+  {
     type: CardType.DRAGDROP,
     instructions: 'Match each malware type to its primary characteristic:',
     targets: [
@@ -171,5 +258,25 @@ export const threatsCards = [
     domain: Domain.THREATS,
     topic: 'Malware',
     difficulty: Difficulty.MEDIUM
+  },
+  {
+    type: CardType.DRAGDROP,
+    instructions: 'Match each attack type to its description:',
+    targets: [
+      { label: 'XSS', correctItem: 'Injects malicious scripts into web pages viewed by users' },
+      { label: 'CSRF', correctItem: 'Tricks users into executing unwanted actions while authenticated' },
+      { label: 'SQL Injection', correctItem: 'Inserts malicious SQL commands into database queries' },
+      { label: 'Buffer Overflow', correctItem: 'Writes data beyond allocated memory boundaries' }
+    ],
+    items: [
+      'Injects malicious scripts into web pages viewed by users',
+      'Tricks users into executing unwanted actions while authenticated',
+      'Inserts malicious SQL commands into database queries',
+      'Writes data beyond allocated memory boundaries'
+    ],
+    explanation: 'Common application attacks exploit input validation weaknesses. XSS targets browsers, CSRF exploits trust, SQL injection targets databases, buffer overflow targets memory.',
+    domain: Domain.THREATS,
+    topic: 'Application Attacks',
+    difficulty: Difficulty.HARD
   }
 ]
