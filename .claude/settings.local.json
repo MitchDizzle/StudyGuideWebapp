@@ -10,7 +10,9 @@
       "Bash(tasklist:*)",
       "Bash(netstat:*)",
       "Bash(for file in src/data/packs/security-plus/*.js)",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(node scripts/card-converter.js:*)",
+      "Bash(ls:*)"
     ]
   }
 }

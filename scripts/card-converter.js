@@ -9,8 +9,13 @@
  *   npm run convert:to-js -- <input.csv> <output.js>
  */
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { pathToFileURL } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // CSV Headers
 const CSV_HEADERS = [
@@ -158,32 +163,74 @@ function parseCSVRow(row) {
 }
 
 /**
- * Convert JS file to CSV
+ * Convert JS file to CSV using dynamic import
  */
-function jsToCSV(inputPath, outputPath) {
+async function jsToCSV(inputPath, outputPath) {
   console.log(`Converting ${inputPath} to CSV...`);
 
-  // Read and parse the JS file
-  const jsContent = fs.readFileSync(inputPath, 'utf8');
+  // Create stub types module to satisfy imports
+  const stubTypesPath = path.join(__dirname, 'stub-types.mjs');
+  const stubContent = `export const CardType = {
+  DEFINITION: 'definition',
+  SCENARIO: 'scenario',
+  DRAGDROP: 'dragdrop'
+};
 
-  // Extract the cards array using regex
-  const cardsMatch = jsContent.match(/export const \w+Cards = \[([\s\S]*)\]/);
-  if (!cardsMatch) {
-    throw new Error('Could not find cards array in JS file');
+export const Domain = {
+  THREATS: 'Threats, Attacks, and Vulnerabilities',
+  ARCHITECTURE: 'Architecture and Design',
+  IMPLEMENTATION: 'Implementation',
+  OPERATIONS: 'Operations and Incident Response',
+  GOVERNANCE: 'Governance, Risk, and Compliance'
+};
+
+export const Difficulty = {
+  EASY: 'easy',
+  MEDIUM: 'medium',
+  HARD: 'hard'
+};
+`;
+
+  fs.writeFileSync(stubTypesPath, stubContent);
+
+  try {
+    // Create a temporary modified version that imports from our stub
+    const originalContent = fs.readFileSync(inputPath, 'utf8');
+    const modifiedContent = originalContent.replace(
+      /from ['"]@\/types['"]/g,
+      `from '${pathToFileURL(stubTypesPath).href}'`
+    );
+
+    const tempPath = path.join(__dirname, '__temp_import__.mjs');
+    fs.writeFileSync(tempPath, modifiedContent);
+
+    // Import the modified file
+    const module = await import(pathToFileURL(tempPath).href + '?t=' + Date.now());
+
+    // Find the exported cards array (should be the first export that's an array)
+    const cards = Object.values(module).find(value => Array.isArray(value));
+
+    if (!cards || cards.length === 0) {
+      throw new Error('No cards array found in JS file');
+    }
+
+    // Convert to CSV
+    const csvLines = [CSV_HEADERS.join(',')];
+    cards.forEach(card => {
+      csvLines.push(cardToCSVRow(card));
+    });
+
+    fs.writeFileSync(outputPath, csvLines.join('\n'), 'utf8');
+    console.log(`✓ Converted ${cards.length} cards to ${outputPath}`);
+
+    // Cleanup temp files
+    fs.unlinkSync(tempPath);
+  } finally {
+    // Cleanup stub file
+    if (fs.existsSync(stubTypesPath)) {
+      fs.unlinkSync(stubTypesPath);
+    }
   }
-
-  // Evaluate the cards array
-  const cardsCode = cardsMatch[1];
-  const cards = eval(`[${cardsCode}]`);
-
-  // Convert to CSV
-  const csvLines = [CSV_HEADERS.join(',')];
-  cards.forEach(card => {
-    csvLines.push(cardToCSVRow(card));
-  });
-
-  fs.writeFileSync(outputPath, csvLines.join('\n'), 'utf8');
-  console.log(`✓ Converted ${cards.length} cards to ${outputPath}`);
 }
 
 /**
@@ -205,9 +252,6 @@ function csvToJS(inputPath, outputPath) {
   // Determine variable name from output filename
   const baseName = path.basename(outputPath, '.js');
   const varName = baseName.replace(/-./g, x => x[1].toUpperCase()) + 'Cards';
-
-  // Determine domain from first card
-  const domain = cards[0]?.domain || 'General';
 
   // Generate JS content
   const jsContent = `import { CardType, Domain, Difficulty } from '@/types'
@@ -286,7 +330,7 @@ if (!command || !inputPath || !outputPath) {
 
 try {
   if (command === 'to-csv') {
-    jsToCSV(inputPath, outputPath);
+    await jsToCSV(inputPath, outputPath);
   } else if (command === 'to-js') {
     csvToJS(inputPath, outputPath);
   } else {
@@ -295,5 +339,6 @@ try {
   }
 } catch (error) {
   console.error('Error:', error.message);
+  console.error(error.stack);
   process.exit(1);
 }
