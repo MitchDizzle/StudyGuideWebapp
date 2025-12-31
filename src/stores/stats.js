@@ -134,14 +134,18 @@ export const useStatsStore = defineStore('stats', () => {
 
   async function addReview(reviewData) {
     const review = createReview(reviewData)
-    await db.saveReview(review)
-    reviews.value.push(review)
+
+    // Convert to plain object for IndexedDB (can't store Vue Proxies)
+    const plainReview = JSON.parse(JSON.stringify(review))
+
+    await db.saveReview(plainReview)
+    reviews.value.push(plainReview)
 
     if (currentSession.value) {
       currentSession.value.cardsStudied++
     }
 
-    return review
+    return plainReview
   }
 
   async function startSession(deckId = null) {
@@ -156,10 +160,13 @@ export const useStatsStore = defineStore('stats', () => {
     currentSession.value.endedAt = new Date().toISOString()
     currentSession.value.timeSpent = new Date(currentSession.value.endedAt) - new Date(currentSession.value.startedAt)
 
-    await db.saveSession(currentSession.value)
-    sessions.value.push(currentSession.value)
+    // Convert to plain object for IndexedDB (can't store Vue Proxies)
+    const plainSession = JSON.parse(JSON.stringify(currentSession.value))
 
-    const session = currentSession.value
+    await db.saveSession(plainSession)
+    sessions.value.push(plainSession)
+
+    const session = plainSession
     currentSession.value = null
     return session
   }
@@ -209,6 +216,9 @@ export const useStatsStore = defineStore('stats', () => {
     await db.saveSetting('dailyGoal', goal)
   }
 
+  // Alias for consistency with other update methods
+  const updateDailyGoal = setDailyGoal
+
   return {
     reviews,
     sessions,
@@ -228,6 +238,7 @@ export const useStatsStore = defineStore('stats', () => {
     endSession,
     updateStreak,
     loadSettings,
-    setDailyGoal
+    setDailyGoal,
+    updateDailyGoal
   }
 })
