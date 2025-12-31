@@ -4,6 +4,8 @@ export const CardType = {
   DRAGDROP: 'dragdrop'
 }
 
+// Legacy: Kept for backwards compatibility
+// Domains are now dynamically extracted from enabled packs
 export const Domain = {
   THREATS: 'Threats, Attacks, and Vulnerabilities',
   ARCHITECTURE: 'Architecture and Design',
@@ -40,7 +42,7 @@ export function createCard({
   instructions = '',
   targets = [],
   items = [],
-  domain = Domain.THREATS,
+  domain = 'General',
   topic = '',
   difficulty = Difficulty.MEDIUM,
   deckId = null,

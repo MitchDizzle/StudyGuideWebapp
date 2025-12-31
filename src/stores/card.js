@@ -40,6 +40,28 @@ export const useCardStore = defineStore('card', () => {
     return topics
   })
 
+  // Get all unique domains from enabled cards
+  const availableDomains = computed(() => {
+    const domains = new Set()
+    cards.value.forEach(card => {
+      if (card.domain) {
+        domains.add(card.domain)
+      }
+    })
+    return Array.from(domains).sort()
+  })
+
+  // Get all unique topics from enabled cards
+  const availableTopics = computed(() => {
+    const topics = new Set()
+    cards.value.forEach(card => {
+      if (card.topic) {
+        topics.add(card.topic)
+      }
+    })
+    return Array.from(topics).sort()
+  })
+
   async function loadCards() {
     loading.value = true
     try {
@@ -137,6 +159,8 @@ export const useCardStore = defineStore('card', () => {
     cardsDueToday,
     nextCard,
     cardsByTopic,
+    availableDomains,
+    availableTopics,
     loadCards,
     addCard,
     addCards,
